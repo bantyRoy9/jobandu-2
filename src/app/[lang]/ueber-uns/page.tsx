@@ -2,8 +2,9 @@ import { getDictionary, Locale } from '@/i18n/dictionaries'
 import Navbar from '@/components/Navbar'
 import AboutHero from '@/components/AboutHero'
 import TeamBios from '@/components/TeamBios'
-import AboutWhy from '@/components/AboutWhy'
-import AboutContact from '@/components/AboutContact'
+import WhyJobandu from '@/components/WhyJobandu'
+import TeamSection from '@/components/TeamSection'
+import ContactSection from '@/components/ContactSection'
 import Footer from '@/components/Footer'
 
 export default function UeberUnsPage({ params: { lang } }: { params: { lang: Locale } }) {
@@ -14,8 +15,9 @@ export default function UeberUnsPage({ params: { lang } }: { params: { lang: Loc
       <Navbar dict={dict.nav} lang={lang} />
       <AboutHero dict={dict.about} lang={lang} />
       <TeamBios dict={dict.about} lang={lang} />
-      <AboutWhy dict={dict.about} />
-      <AboutContact dict={dict.contact} />
+      <WhyJobandu dict={dict.why} />
+      <TeamSection dict={dict.team} />
+      <ContactSection dict={dict.contact} />
       <Footer footerDict={dict.footer} navDict={dict.nav} lang={lang} />
     </main>
   )

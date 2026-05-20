@@ -15,9 +15,9 @@ export default function Home({ params: { lang } }: { params: { lang: Locale } })
   return (
     <main>
       <Navbar dict={dict.nav} lang={lang} />
-      <Hero dict={dict.hero} />
+      <Hero dict={dict.hero} lang={lang} />
       <FeatureStrip dict={dict.features} />
-      <Expertise dict={dict.expertise} />
+      <Expertise dict={dict.expertise} lang={lang} />
       <PartnerSection dict={dict.partner} />
       <WhyJobandu dict={dict.why} />
       <TeamSection dict={dict.team} />

@@ -1,65 +1,74 @@
 import Link from 'next/link'
 
-export default function Hero({ dict }: { dict: any }) {
+interface HeroDict {
+  title: string
+  subtitle1: string
+  subtitle2: string
+  subtitle3: string
+  btnApply: string
+  jobs: string
+  more: string
+  contactPerson: string
+  contact: string
+}
+
+export default function Hero({ dict, lang }: { dict: HeroDict; lang: string }) {
+  const quickLinks = [
+    { label: dict.jobs,          href: `/${lang}/fuer-bewerber#stellenangebote` },
+    { label: dict.contactPerson, href: `/${lang}/ueber-uns#team` },
+    { label: dict.contact,       href: `/${lang}/kontakt` },
+  ]
+
   return (
     <section className="hero-section">
+      {/* Dark gradient overlay — stronger on left, fades right */}
       <div className="hero-overlay" />
 
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
-        <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-8">
+      <div className="hero-content">
+        {/* ── LEFT: headline + subtitle + CTA ── */}
+        <div className="hero-left">
+          <h1 className="hero-title anim">
+            {dict.title}
+          </h1>
+          <p className="hero-subtitle anim anim-1">
+            {dict.subtitle1}
+            <br />
+            {dict.subtitle2}
+            <strong>{dict.subtitle3}</strong>
+          </p>
+          <a href={`/${lang}/fuer-bewerber`} className="hero-apply-btn anim anim-2">
+            {dict.btnApply}
+          </a>
+        </div>
 
-          {/* Left: text content */}
-          <div className="max-w-xl">
-            <h1 className="text-white text-2xl md:text-3xl lg:text-4xl font-extrabold leading-tight mb-4 anim">
-              {dict.title}
-            </h1>
-            <p className="text-gray-200 text-sm md:text-base leading-relaxed mb-6 anim anim-1">
-              <strong className="text-white">{dict.subtitle1}</strong>{' '}
-              {dict.subtitle2} <strong className="text-white">{dict.subtitle3}</strong>
-            </p>
-            <div className="flex flex-wrap gap-3 anim anim-2">
-              <a href="#jetzt-bewerben" className="btn-primary">{dict.btnApply}</a>
+        {/* ── RIGHT: quick links ── */}
+        <div className="hero-right anim anim-3">
+          {quickLinks.map((link, i) => (
+            <div key={link.href}>
+              {i > 0 && <div className="hero-divider" />}
+              <Link href={link.href} className="hero-quick-link group">
+                <span className="hero-quick-label">{link.label}</span>
+                <span className="hero-quick-more">
+                  <span className="hero-quick-icon">
+                    <svg
+                      width="22" height="22"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      aria-hidden="true"
+                    >
+                      <circle cx="12" cy="12" r="10" />
+                      <path d="M12 8l4 4-4 4M8 12h8" />
+                    </svg>
+                  </span>
+                  <span className="hero-quick-more-text">{dict.more}</span>
+                </span>
+              </Link>
             </div>
-          </div>
-
-          {/* Right: quick link columns */}
-          <div className="flex flex-col gap-6 lg:min-w-[240px] anim anim-3 mt-10 lg:mt-0">
-            <Link href="/fuer-bewerber#stellenangebot" className="group flex items-start flex-col gap-2 relative">
-              <h3 className="text-white text-lg font-bold">Stellenangebote</h3>
-              <div className="flex items-center gap-2 text-white">
-                <div className="w-8 h-8 rounded-full bg-transparent border-none flex items-center justify-center">
-                  <svg className="w-6 h-6 text-primary transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/>
-                  </svg>
-                </div>
-                <h5 className="text-sm font-semibold uppercase tracking-wider">{dict.more}</h5>
-              </div>
-            </Link>
-
-            <Link href="/ueber-uns#ueber-uns" className="group flex items-start flex-col gap-2 relative">
-              <h3 className="text-white text-lg font-bold">Ansprechpartner</h3>
-              <div className="flex items-center gap-2 text-white">
-                <div className="w-8 h-8 rounded-full bg-transparent border-none flex items-center justify-center">
-                  <svg className="w-6 h-6 text-primary transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/>
-                  </svg>
-                </div>
-                <h5 className="text-sm font-semibold uppercase tracking-wider">{dict.more}</h5>
-              </div>
-            </Link>
-
-            <Link href="/kontakt" className="group flex items-start flex-col gap-2 relative">
-              <h3 className="text-white text-lg font-bold">Kontakt</h3>
-              <div className="flex items-center gap-2 text-white">
-                <div className="w-8 h-8 rounded-full bg-transparent border-none flex items-center justify-center">
-                  <svg className="w-6 h-6 text-primary transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7"/>
-                  </svg>
-                </div>
-                <h5 className="text-sm font-semibold uppercase tracking-wider">{dict.more}</h5>
-              </div>
-            </Link>
-          </div>
+          ))}
         </div>
       </div>
     </section>

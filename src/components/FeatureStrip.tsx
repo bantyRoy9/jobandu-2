@@ -2,41 +2,71 @@ export default function FeatureStrip({ dict }: { dict: any }) {
   const features = [
     {
       text: dict.f1,
-      icon: "https://jobandu.de/wp-content/uploads/2021/09/about-icon-1.svg",
+      icon: (
+        // Hexagon / gear-like shape — "qualified specialists"
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <path d="M20 3l14.5 8.25v16.5L20 36 5.5 27.75V11.25L20 3z" />
+          <circle cx="20" cy="20" r="5" />
+        </svg>
+      ),
     },
     {
       text: dict.f2,
-      icon: "https://jobandu.de/wp-content/uploads/2021/09/about-icon-2.svg",
+      icon: (
+        // Person with scan frame — "customised solutions"
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <rect x="4" y="4" width="10" height="10" rx="1" />
+          <rect x="26" y="4" width="10" height="10" rx="1" />
+          <rect x="4" y="26" width="10" height="10" rx="1" />
+          <rect x="26" y="26" width="10" height="10" rx="1" />
+          <circle cx="20" cy="16" r="4" />
+          <path d="M13 30c0-3.866 3.134-7 7-7s7 3.134 7 7" />
+        </svg>
+      ),
     },
     {
       text: dict.f3,
-      icon: "https://jobandu.de/wp-content/uploads/2021/09/about-icon-3.svg",
+      icon: (
+        // Concentric circles / target — "partnership at eye level"
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <circle cx="20" cy="20" r="17" />
+          <circle cx="20" cy="20" r="11" />
+          <circle cx="20" cy="20" r="5" />
+          <circle cx="20" cy="20" r="1.5" fill="currentColor" stroke="none" />
+        </svg>
+      ),
     },
     {
       text: dict.f4,
-      icon: "https://jobandu.de/wp-content/uploads/2021/09/about-icon-4.svg",
+      icon: (
+        // 2×2 grid / dashboard — "expertise in temporary employment"
+        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+          <rect x="4" y="4" width="14" height="14" rx="1" />
+          <rect x="22" y="4" width="14" height="14" rx="1" />
+          <rect x="4" y="22" width="14" height="14" rx="1" />
+          <rect x="22" y="22" width="14" height="14" rx="1" />
+        </svg>
+      ),
     },
   ]
 
   return (
     <>
-      {/* 4-col feature strip */}
-      <section className="bg-navy py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 divide-y sm:divide-y-0 sm:divide-x divide-gray-800">
-            {features.map((f, i) => (
-              <div key={i} className="flex flex-col items-start sm:items-center text-left sm:text-center px-4 pt-6 sm:pt-0">
-                <img src={f.icon} alt="feature icon" className="w-12 h-12 mb-4" />
-                <h5 className="text-sm font-semibold text-white leading-snug">{f.text}</h5>
-              </div>
-            ))}
-          </div>
+      {/* ── 4-column feature strip on dark background ── */}
+      <section className="feature-strip-dark">
+        <div className="feature-strip-inner">
+          {features.map((f, i) => (
+            <div key={i} className="feature-strip-item">
+              <span className="feature-strip-icon">{f.icon}</span>
+              <p className="feature-strip-text">{f.text}</p>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* Green emergency bar */}
+      {/* ── Green emergency bar ── */}
       <div className="emergency-bar">
-        <a href="tel:+491732827622" className="hover:underline text-white flex items-center justify-center gap-2">
+        <a href="tel:+491732827622" className="emergency-bar-link">
           <span>{dict.emergency}</span>
           <strong>+49 1732827622</strong>
         </a>
