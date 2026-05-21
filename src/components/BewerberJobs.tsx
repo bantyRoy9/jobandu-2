@@ -1,14 +1,61 @@
 'use client'
 import { useState } from 'react'
+import { PUBLIC_API_BASE } from '@/lib/admin-api'
 
 export default function BewerberJobs({ dict, lang }: { dict: any; lang: string }) {
   const [selectedJob, setSelectedJob] = useState<any | null>(null)
   const [submitted, setSubmitted] = useState(false)
+  const [applyName, setApplyName] = useState('')
+  const [applyEmail, setApplyEmail] = useState('')
+  const [applyFile, setApplyFile] = useState<File | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setSubmitted(true)
-    setTimeout(() => { setSelectedJob(null); setSubmitted(false) }, 2500)
+    if (!applyName || !applyEmail || !applyFile) {
+      alert('Please fill all required fields.')
+      return
+    }
+    setLoading(true)
+    setError('')
+
+    const fd = new FormData()
+    fd.append('name', applyName)
+    fd.append('email', applyEmail)
+    fd.append('phone', '')
+    fd.append('location', selectedJob.location || 'Not specified')
+    fd.append('skills', JSON.stringify([selectedJob.title]))
+    fd.append('experience_years', '0')
+    fd.append('cv', applyFile)
+
+    try {
+      const res = await fetch(`${PUBLIC_API_BASE}/applicants/`, {
+        method: 'POST',
+        body: fd
+      })
+
+      if (!res.ok) {
+        let msg = `Error ${res.status}`
+        try {
+          const errData = await res.json()
+          msg = errData.detail || msg
+        } catch {
+          /* noop */
+        }
+        throw new Error(msg)
+      }
+
+      setSubmitted(true)
+      setApplyName('')
+      setApplyEmail('')
+      setApplyFile(null)
+      setTimeout(() => { setSelectedJob(null); setSubmitted(false) }, 4000)
+    } catch (err) {
+      setError((err as Error).message || 'Something went wrong. Please try again.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   const applyLabel  = lang === 'de' ? 'Jetzt bewerben!' : lang === 'ro' ? 'Aplică acum!' : 'Apply now!'
@@ -108,32 +155,47 @@ export default function BewerberJobs({ dict, lang }: { dict: any; lang: string }
                 <p className="modal-job-name">{selectedJob.title}</p>
 
                 <form onSubmit={handleSubmit} className="modal-form">
+                  {error && (
+                    <div style={{ background: '#f8d7da', color: '#721c24', padding: '10px', borderRadius: '4px', marginBottom: '12px', fontSize: '0.875rem' }}>
+                      {error}
+                    </div>
+                  )}
                   <div>
                     <label className="form-label">
                       {lang === 'de' ? 'Vollständiger Name *' : lang === 'ro' ? 'Nume complet *' : 'Full Name *'}
                     </label>
-                    <input type="text" required className="form-input" />
+                    <input type="text" required className="form-input" value={applyName} onChange={e => setApplyName(e.target.value)} />
                   </div>
                   <div>
                     <label className="form-label">E-Mail *</label>
-                    <input type="email" required className="form-input" />
+                    <input type="email" required className="form-input" value={applyEmail} onChange={e => setApplyEmail(e.target.value)} />
                   </div>
                   <div>
                     <label className="form-label">
                       {lang === 'de' ? 'Lebenslauf (PDF) *' : lang === 'ro' ? 'CV (PDF) *' : 'CV (PDF) *'}
                     </label>
                     <label className="cv-upload-area">
-                      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="cv-upload-icon">
-                        <path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-                      </svg>
-                      <span className="cv-upload-text">
-                        {lang === 'de' ? 'PDF auswählen' : lang === 'ro' ? 'Alege PDF' : 'Select PDF'}
-                      </span>
-                      <input type="file" accept=".pdf" required className="sr-only" />
+                      {applyFile ? (
+                        <span className="cv-upload-text" style={{ color: 'var(--color-primary)', fontWeight: 'bold' }}>📄 {applyFile.name}</span>
+                      ) : (
+                        <>
+                          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="cv-upload-icon">
+                            <path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                          </svg>
+                          <span className="cv-upload-text">
+                            {lang === 'de' ? 'PDF auswählen' : lang === 'ro' ? 'Alege PDF' : 'Select PDF'}
+                          </span>
+                        </>
+                      )}
+                      <input type="file" accept=".pdf" required className="sr-only" onChange={e => {
+                        if (e.target.files && e.target.files.length > 0) {
+                          setApplyFile(e.target.files[0])
+                        }
+                      }} />
                     </label>
                   </div>
-                  <button type="submit" className="btn-primary w-full">
-                    {lang === 'de' ? 'Bewerbung absenden' : lang === 'ro' ? 'Trimite candidatura' : 'Submit Application'}
+                  <button type="submit" className="btn-primary w-full" disabled={loading}>
+                    {loading ? 'Sending...' : (lang === 'de' ? 'Bewerbung absenden' : lang === 'ro' ? 'Trimite candidatura' : 'Submit Application')}
                   </button>
                 </form>
               </>

@@ -34,6 +34,7 @@ export default function Footer({ footerDict, navDict, lang }: { footerDict: any;
                 { label: navDict.leistungen,  href: `/${lang}/leistungen` },
                 { label: navDict.ueberUns,    href: `/${lang}/ueber-uns` },
                 { label: navDict.kontakt,     href: `/${lang}/kontakt` },
+                { label: navDict.adminLogin || 'Admin', href: `/admin/login` },
               ].map(l => (
                 <li key={l.href}>
                   <Link href={l.href} className="footer-nav-link">

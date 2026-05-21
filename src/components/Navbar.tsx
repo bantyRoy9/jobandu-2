@@ -1,6 +1,8 @@
 'use client'
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import { PUBLIC_API_BASE } from '@/lib/admin-api'
+import AdminLoginModal from '@/components/admin/AdminLoginModal'
 
 export default function Navbar({ dict, lang }: { dict: any; lang: string }) {
   const navLinks = [
@@ -19,9 +21,81 @@ export default function Navbar({ dict, lang }: { dict: any; lang: string }) {
 
   const activeLang = languages.find(l => l.code === lang) || languages[0]
 
-  const [mobileOpen, setMobileOpen]   = useState(false)
-  const [langOpen,   setLangOpen]     = useState(false)
-  const [applyOpen,  setApplyOpen]    = useState(false)
+  const [mobileOpen, setMobileOpen]     = useState(false)
+  const [langOpen,   setLangOpen]       = useState(false)
+  const [applyOpen,  setApplyOpen]      = useState(false)
+  const [adminModalOpen, setAdminModalOpen] = useState(false)
+
+  const [applyForm, setApplyForm] = useState({ name: '', email: '' })
+  const [applyFile, setApplyFile] = useState<File | null>(null)
+  const [applyLoading, setApplyLoading] = useState(false)
+  const [applySuccessMsg, setApplySuccessMsg] = useState('')
+
+  const readFileAsBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => resolve(e.target?.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  const handleApplySubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!applyForm.name || !applyForm.email) {
+      alert('Please fill all required fields.');
+      return;
+    }
+    
+    setApplyLoading(true);
+    
+    const fd = new FormData();
+    fd.append('name', applyForm.name);
+    fd.append('email', applyForm.email);
+    fd.append('phone', '');
+    fd.append('location', 'Not specified');
+    fd.append('skills', JSON.stringify(['General Application']));
+    fd.append('experience_years', '0');
+    
+    if (applyFile) {
+      if (applyFile.size > 5 * 1024 * 1024) {
+        alert('File too large. Maximum size is 5MB.');
+        setApplyLoading(false);
+        return;
+      }
+      fd.append('cv', applyFile);
+    }
+    
+    try {
+      const res = await fetch(`${PUBLIC_API_BASE}/applicants/`, {
+        method: 'POST',
+        body: fd,
+      });
+
+      if (!res.ok) {
+        let msg = `Error ${res.status}`;
+        try {
+          const errData = await res.json();
+          msg = errData.detail || msg;
+        } catch {
+          /* noop */
+        }
+        throw new Error(msg);
+      }
+      
+      setApplySuccessMsg(dict.successMsg || "Application sent successfully!");
+      setTimeout(() => {
+        setApplySuccessMsg('');
+        setApplyOpen(false);
+        setApplyForm({ name: '', email: '' });
+        setApplyFile(null);
+      }, 3000);
+    } catch (err) {
+      alert((err as Error).message || 'Something went wrong. Please try again.');
+    } finally {
+      setApplyLoading(false);
+    }
+  }
 
   const langRef = useRef<HTMLDivElement>(null)
 
@@ -121,8 +195,21 @@ export default function Navbar({ dict, lang }: { dict: any; lang: string }) {
             </div>
           </div>
 
-          {/* ── RIGHT: CTA buttons (desktop) ── */}
+          {/* ── RIGHT: CTA buttons + Admin (desktop) ── */}
           <div className="navbar-right">
+            {/* Admin login button — icon + label */}
+            <button
+              id="admin-login-btn"
+              className="admin-header-btn"
+              onClick={() => setAdminModalOpen(true)}
+              aria-label="Admin login"
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+              </svg>
+              {dict.adminLogin || 'Admin'}
+            </button>
             <button
               onClick={() => setApplyOpen(true)}
               className="btn-nav-primary"
@@ -179,6 +266,17 @@ export default function Navbar({ dict, lang }: { dict: any; lang: string }) {
             {/* Mobile CTAs */}
             <div className="navbar-mobile-ctas">
               <button
+                onClick={() => { setAdminModalOpen(true); setMobileOpen(false) }}
+                className="admin-header-btn w-full"
+                style={{ justifyContent: 'center' }}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                </svg>
+                {dict.adminLogin || 'Admin'}
+              </button>
+              <button
                 onClick={() => { setApplyOpen(true); setMobileOpen(false) }}
                 className="btn-nav-primary w-full"
               >
@@ -219,30 +317,48 @@ export default function Navbar({ dict, lang }: { dict: any; lang: string }) {
             <h3 id="apply-modal-title" className="modal-title">{dict.applyTitle}</h3>
             <p className="modal-desc">{dict.applyDesc}</p>
 
-            <div className="modal-form">
+            <form className="modal-form" onSubmit={handleApplySubmit}>
+              {applySuccessMsg && (
+                <div style={{ background: '#d4edda', color: '#155724', padding: '12px', borderRadius: '4px', marginBottom: '16px' }}>
+                  {applySuccessMsg}
+                </div>
+              )}
               <div>
-                <label className="form-label">{dict.name}</label>
-                <input type="text" className="form-input" autoComplete="name" />
+                <label className="form-label">{dict.name} *</label>
+                <input type="text" className="form-input" autoComplete="name" required value={applyForm.name} onChange={e => setApplyForm({ ...applyForm, name: e.target.value })} />
               </div>
               <div>
-                <label className="form-label">{dict.email}</label>
-                <input type="email" className="form-input" autoComplete="email" />
+                <label className="form-label">{dict.email} *</label>
+                <input type="email" className="form-input" autoComplete="email" required value={applyForm.email} onChange={e => setApplyForm({ ...applyForm, email: e.target.value })} />
               </div>
               <div>
                 <label className="form-label">{dict.uploadCV}</label>
                 <label className="cv-upload-area">
-                  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="cv-upload-icon">
-                    <path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-                  </svg>
-                  <span className="cv-upload-text">{dict.uploadBtn}</span>
-                  <input type="file" accept=".pdf" className="sr-only" />
+                  {applyFile ? (
+                    <span className="cv-upload-text" style={{ color: 'var(--color-primary)', fontWeight: 'bold' }}>📄 {applyFile.name}</span>
+                  ) : (
+                    <>
+                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="cv-upload-icon">
+                        <path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                      </svg>
+                      <span className="cv-upload-text">{dict.uploadBtn}</span>
+                    </>
+                  )}
+                  <input type="file" accept=".pdf" className="sr-only" onChange={e => {
+                    if (e.target.files && e.target.files.length > 0) {
+                      setApplyFile(e.target.files[0]);
+                    }
+                  }} />
                 </label>
               </div>
-              <button className="btn-nav-primary w-full mt-1">{dict.submitBtn}</button>
-            </div>
+              <button type="submit" className="btn-nav-primary w-full mt-1" disabled={applyLoading}>
+                {applyLoading ? 'Sending...' : dict.submitBtn}
+              </button>
+            </form>
           </div>
         </div>
       )}
+      {adminModalOpen && <AdminLoginModal onClose={() => setAdminModalOpen(false)} />}
     </>
   )
 }

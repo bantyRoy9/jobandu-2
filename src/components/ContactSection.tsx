@@ -1,10 +1,60 @@
 'use client'
 import { useState, useEffect } from 'react'
+import { PUBLIC_API_BASE } from '@/lib/admin-api'
 
 export default function ContactSection({ dict }: { dict: any }) {
   const [form, setForm] = useState({ name: '', email: '', betreff: '', nachricht: '' })
   const [mounted, setMounted] = useState(false)
   useEffect(() => { setMounted(true) }, [])
+
+  const [loading, setLoading] = useState(false)
+  const [successMsg, setSuccessMsg] = useState('')
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!form.name || !form.email || !form.nachricht) {
+      alert('Please fill all required fields.')
+      return
+    }
+    setLoading(true)
+    
+    const payload = {
+      company_name: form.betreff || 'General Inquiry',
+      contact_person: form.name,
+      email: form.email,
+      phone: 'Not provided',
+      requirements: form.betreff ? [form.betreff] : ['General'],
+      location: 'Not provided',
+      notes: form.nachricht,
+    }
+    
+    try {
+      const res = await fetch(`${PUBLIC_API_BASE}/employers`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        let msg = `Error ${res.status}`;
+        try {
+          const errData = await res.json();
+          msg = errData.detail || msg;
+        } catch {
+          /* noop */
+        }
+        throw new Error(msg);
+      }
+      
+      setForm({ name: '', email: '', betreff: '', nachricht: '' })
+      setSuccessMsg(dict.successMsg || "Message sent! We'll respond within 24 hours.")
+      setTimeout(() => setSuccessMsg(''), 6000)
+    } catch (err) {
+      alert((err as Error).message || 'Something went wrong. Please try again.')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const infoCards = [
     {
@@ -85,16 +135,21 @@ export default function ContactSection({ dict }: { dict: any }) {
         <div className="contact-grid">
 
           {/* Left: contact form */}
-          <div className="contact-form-box">
+          <form className="contact-form-box" onSubmit={handleSubmit}>
+            {successMsg && (
+              <div style={{ background: '#d4edda', color: '#155724', padding: '12px', borderRadius: '4px', marginBottom: '16px' }}>
+                {successMsg}
+              </div>
+            )}
             <div className="contact-form-row-2">
               <div>
-                <label className="form-label">{dict.nameLabel}</label>
-                <input type="text" className="form-input" value={form.name}
+                <label className="form-label">{dict.nameLabel} *</label>
+                <input type="text" className="form-input" value={form.name} required
                   onChange={e => setForm({ ...form, name: e.target.value })} />
               </div>
               <div>
-                <label className="form-label">{dict.emailLabel}</label>
-                <input type="email" className="form-input" value={form.email}
+                <label className="form-label">{dict.emailLabel} *</label>
+                <input type="email" className="form-input" value={form.email} required
                   onChange={e => setForm({ ...form, email: e.target.value })} />
               </div>
             </div>
@@ -104,13 +159,15 @@ export default function ContactSection({ dict }: { dict: any }) {
                 onChange={e => setForm({ ...form, betreff: e.target.value })} />
             </div>
             <div className="form-row">
-              <label className="form-label">{dict.msgLabel}</label>
-              <textarea className="form-input" rows={5} placeholder={dict.msgPlaceholder}
+              <label className="form-label">{dict.msgLabel} *</label>
+              <textarea className="form-input" rows={5} placeholder={dict.msgPlaceholder} required
                 value={form.nachricht}
                 onChange={e => setForm({ ...form, nachricht: e.target.value })} />
             </div>
-            <button className="btn-primary w-full">{dict.submitBtn}</button>
-          </div>
+            <button type="submit" className="btn-primary w-full" disabled={loading}>
+              {loading ? 'Sending...' : dict.submitBtn}
+            </button>
+          </form>
 
           {/* Right: Google Map */}
           <div className="contact-map">

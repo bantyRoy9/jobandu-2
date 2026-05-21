@@ -7,6 +7,9 @@ const defaultLocale = 'de'
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
 
+  // Admin routes are locale-free — never redirect them
+  if (pathname.startsWith('/admin')) return
+
   // Check if there is any supported locale in the pathname
   const pathnameHasLocale = locales.some(
     (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
@@ -21,7 +24,7 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Skip all internal paths (_next)
-    '/((?!_next|api|favicon.ico|wp-content|images|.*\\\\..*).*)',
+    // Skip _next internals, api, static files, and admin routes
+    '/((?!_next|api|admin|favicon.ico|wp-content|images|.*\\..*).*)',
   ],
 }
