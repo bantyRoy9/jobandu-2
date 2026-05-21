@@ -27,9 +27,9 @@ export default function Hero({ dict, lang }: { dict: HeroDict; lang: string }) {
       <div className="hero-content">
         {/* ── LEFT: headline + subtitle + CTA ── */}
         <div className="hero-left">
-          <h1 className="hero-title anim">
+          <h2 className="hero-title anim">
             {dict.title}
-          </h1>
+          </h2>
           <p className="hero-subtitle anim anim-1">
             {dict.subtitle1}
             <br />
@@ -51,7 +51,7 @@ export default function Hero({ dict, lang }: { dict: HeroDict; lang: string }) {
                 <span className="hero-quick-more">
                   <span className="hero-quick-icon">
                     <svg
-                      width="22" height="22"
+                      width="30" height="30"
                       viewBox="0 0 24 24"
                       fill="none"
                       stroke="currentColor"

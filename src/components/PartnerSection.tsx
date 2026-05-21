@@ -3,7 +3,15 @@ import { useState } from 'react'
 import { PUBLIC_API_BASE } from '@/lib/admin-api'
 
 export default function PartnerSection({ dict }: { dict: any }) {
-  const [applyForm, setApplyForm] = useState({ name: '', email: '' })
+  const [applyForm, setApplyForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    nationality: '',
+    dob: '',
+    position: '',
+    message: '',
+  })
   const [applyFile, setApplyFile] = useState<File | null>(null)
   const [applyLoading, setApplyLoading] = useState(false)
   const [applySuccess, setApplySuccess] = useState('')
@@ -16,7 +24,7 @@ export default function PartnerSection({ dict }: { dict: any }) {
 
   const handleApplySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!applyForm.name || !applyForm.email) {
+    if (!applyForm.name || !applyForm.email || !applyForm.nationality || !applyForm.dob) {
       alert('Please fill all required fields.');
       return;
     }
@@ -27,7 +35,11 @@ export default function PartnerSection({ dict }: { dict: any }) {
     const fd = new FormData();
     fd.append('name', applyForm.name);
     fd.append('email', applyForm.email);
-    fd.append('phone', '');
+    fd.append('phone', applyForm.phone);
+    fd.append('nationality', applyForm.nationality);
+    fd.append('dob', applyForm.dob);
+    fd.append('position', applyForm.position);
+    fd.append('message', applyForm.message);
     fd.append('location', 'Not specified');
     fd.append('skills', JSON.stringify(['Corporate Partnership Application']));
     fd.append('experience_years', '0');
@@ -58,8 +70,8 @@ export default function PartnerSection({ dict }: { dict: any }) {
         throw new Error(msg);
       }
 
-      setApplySuccess(dict.successMsg || "Application sent successfully!");
-      setApplyForm({ name: '', email: '' });
+      setApplySuccess(dict.successMsg || 'Application sent successfully!');
+      setApplyForm({ name: '', email: '', phone: '', nationality: '', dob: '', position: '', message: '' });
       setApplyFile(null);
     } catch (err) {
       setApplyError((err as Error).message || 'Something went wrong. Please try again.');
@@ -143,30 +155,89 @@ export default function PartnerSection({ dict }: { dict: any }) {
 
             <form onSubmit={handleApplySubmit} className="partner-form">
               {applySuccess && (
-                <div style={{ background: '#d4edda', color: '#155724', padding: '12px', borderRadius: '8px', marginBottom: '16px', fontSize: '0.875rem' }}>
+                <div style={{ background: '#d4edda', color: '#155724', padding: '12px', borderRadius: '4px', marginBottom: '8px', fontSize: '0.875rem' }}>
                   {applySuccess}
                 </div>
               )}
               {applyError && (
-                <div style={{ background: '#f8d7da', color: '#721c24', padding: '12px', borderRadius: '8px', marginBottom: '16px', fontSize: '0.875rem' }}>
+                <div style={{ background: '#f8d7da', color: '#721c24', padding: '12px', borderRadius: '4px', marginBottom: '8px', fontSize: '0.875rem' }}>
                   {applyError}
                 </div>
               )}
+
+              {/* Name */}
               <div className="form-row">
                 <label className="form-label">{dict.nameLabel}</label>
-                <input type="text" className="form-input" required value={applyForm.name}
-                  onChange={e => setApplyForm({...applyForm, name: e.target.value})} />
+                <input type="text" className="form-input" required
+                  placeholder={dict.nameLabel}
+                  value={applyForm.name}
+                  onChange={e => setApplyForm({ ...applyForm, name: e.target.value })} />
               </div>
+
+              {/* Email */}
               <div className="form-row">
                 <label className="form-label">{dict.emailLabel}</label>
-                <input type="email" className="form-input" required value={applyForm.email}
-                  onChange={e => setApplyForm({...applyForm, email: e.target.value})} />
+                <input type="email" className="form-input" required
+                  placeholder={dict.emailLabel}
+                  value={applyForm.email}
+                  onChange={e => setApplyForm({ ...applyForm, email: e.target.value })} />
               </div>
+
+              {/* Phone */}
+              <div className="form-row">
+                <label className="form-label">{dict.phoneLabel || 'Telefonnummer'}</label>
+                <input type="tel" className="form-input"
+                  placeholder={dict.phoneLabel || 'Telefonnummer'}
+                  value={applyForm.phone}
+                  onChange={e => setApplyForm({ ...applyForm, phone: e.target.value })} />
+              </div>
+
+              {/* Nationality */}
+              <div className="form-row">
+                <label className="form-label">{dict.nationalityLabel || 'Nationalität'} *</label>
+                <input type="text" className="form-input" required
+                  placeholder={`${dict.nationalityLabel || 'Nationalität'} *`}
+                  value={applyForm.nationality}
+                  onChange={e => setApplyForm({ ...applyForm, nationality: e.target.value })} />
+              </div>
+
+              {/* Date of Birth */}
+              <div className="form-row">
+                <label className="form-label">{dict.dobLabel || 'Geburtsdatum'} * (DD.MM.YYYY)</label>
+                <input type="text" className="form-input" required
+                  placeholder={`${dict.dobLabel || 'Geburtsdatum'} * (DD.MM.YYYY)`}
+                  pattern="\d{2}\.\d{2}\.\d{4}"
+                  title="Format: DD.MM.YYYY"
+                  value={applyForm.dob}
+                  onChange={e => setApplyForm({ ...applyForm, dob: e.target.value })} />
+              </div>
+
+              {/* Position */}
+              <div className="form-row">
+                <label className="form-label">{dict.positionLabel || 'Für welche Stelle bewerben Sie sich?'}</label>
+                <input type="text" className="form-input"
+                  placeholder={dict.positionLabel || 'Für welche Stelle bewerben Sie sich?'}
+                  value={applyForm.position}
+                  onChange={e => setApplyForm({ ...applyForm, position: e.target.value })} />
+              </div>
+
+              {/* Message */}
+              <div className="form-row">
+                <label className="form-label">{dict.messageLabel || 'Nachricht oder Kommentar'}</label>
+                <textarea className="form-input" rows={4}
+                  placeholder={dict.messageLabel || 'Nachricht oder Kommentar'}
+                  value={applyForm.message}
+                  onChange={e => setApplyForm({ ...applyForm, message: e.target.value })} />
+              </div>
+
+              {/* CV Upload */}
               <div className="form-row">
                 <label className="form-label">{dict.cvLabel}</label>
                 <label className="cv-drop-zone">
                   {applyFile ? (
-                    <span className="cv-drop-text" style={{ color: 'var(--color-primary)', fontWeight: 'bold' }}>📄 {applyFile.name}</span>
+                    <span className="cv-drop-text" style={{ color: 'var(--primary)', fontWeight: 'bold' }}>
+                      📄 {applyFile.name}
+                    </span>
                   ) : (
                     <>
                       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="cv-drop-icon">
@@ -178,12 +249,11 @@ export default function PartnerSection({ dict }: { dict: any }) {
                     </>
                   )}
                   <input type="file" accept=".pdf" className="sr-only" onChange={e => {
-                    if (e.target.files && e.target.files.length > 0) {
-                      setApplyFile(e.target.files[0]);
-                    }
+                    if (e.target.files && e.target.files.length > 0) setApplyFile(e.target.files[0])
                   }} />
                 </label>
               </div>
+
               <button type="submit" className="btn-primary w-full" disabled={applyLoading}>
                 {applyLoading ? 'Sending...' : dict.submitBtn}
               </button>

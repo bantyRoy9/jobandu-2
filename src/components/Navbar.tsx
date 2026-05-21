@@ -26,7 +26,15 @@ export default function Navbar({ dict, lang }: { dict: any; lang: string }) {
   const [applyOpen,  setApplyOpen]      = useState(false)
   const [adminModalOpen, setAdminModalOpen] = useState(false)
 
-  const [applyForm, setApplyForm] = useState({ name: '', email: '' })
+  const [applyForm, setApplyForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    nationality: '',
+    dob: '',
+    position: '',
+    message: '',
+  })
   const [applyFile, setApplyFile] = useState<File | null>(null)
   const [applyLoading, setApplyLoading] = useState(false)
   const [applySuccessMsg, setApplySuccessMsg] = useState('')
@@ -42,21 +50,25 @@ export default function Navbar({ dict, lang }: { dict: any; lang: string }) {
 
   const handleApplySubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!applyForm.name || !applyForm.email) {
+    if (!applyForm.name || !applyForm.email || !applyForm.nationality || !applyForm.dob) {
       alert('Please fill all required fields.');
       return;
     }
-    
+
     setApplyLoading(true);
-    
+
     const fd = new FormData();
     fd.append('name', applyForm.name);
     fd.append('email', applyForm.email);
-    fd.append('phone', '');
+    fd.append('phone', applyForm.phone);
+    fd.append('nationality', applyForm.nationality);
+    fd.append('dob', applyForm.dob);
+    fd.append('position', applyForm.position);
+    fd.append('message', applyForm.message);
     fd.append('location', 'Not specified');
     fd.append('skills', JSON.stringify(['General Application']));
     fd.append('experience_years', '0');
-    
+
     if (applyFile) {
       if (applyFile.size > 5 * 1024 * 1024) {
         alert('File too large. Maximum size is 5MB.');
@@ -65,7 +77,7 @@ export default function Navbar({ dict, lang }: { dict: any; lang: string }) {
       }
       fd.append('cv', applyFile);
     }
-    
+
     try {
       const res = await fetch(`${PUBLIC_API_BASE}/applicants/`, {
         method: 'POST',
@@ -82,12 +94,12 @@ export default function Navbar({ dict, lang }: { dict: any; lang: string }) {
         }
         throw new Error(msg);
       }
-      
-      setApplySuccessMsg(dict.successMsg || "Application sent successfully!");
+
+      setApplySuccessMsg(dict.successMsg || 'Application sent successfully!');
       setTimeout(() => {
         setApplySuccessMsg('');
         setApplyOpen(false);
-        setApplyForm({ name: '', email: '' });
+        setApplyForm({ name: '', email: '', phone: '', nationality: '', dob: '', position: '', message: '' });
         setApplyFile(null);
       }, 3000);
     } catch (err) {
@@ -314,8 +326,8 @@ export default function Navbar({ dict, lang }: { dict: any; lang: string }) {
               </svg>
             </button>
 
-            <h3 id="apply-modal-title" className="modal-title">{dict.applyTitle}</h3>
-            <p className="modal-desc">{dict.applyDesc}</p>
+            {/* <h3 id="apply-modal-title" className="modal-title">{dict.applyTitle}</h3> */}
+            {/* <p className="modal-desc">{dict.applyDesc}</p> */}
 
             <form className="modal-form" onSubmit={handleApplySubmit}>
               {applySuccessMsg && (
@@ -323,36 +335,124 @@ export default function Navbar({ dict, lang }: { dict: any; lang: string }) {
                   {applySuccessMsg}
                 </div>
               )}
+
+              {/* Name */}
               <div>
-                <label className="form-label">{dict.name} *</label>
-                <input type="text" className="form-input" autoComplete="name" required value={applyForm.name} onChange={e => setApplyForm({ ...applyForm, name: e.target.value })} />
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder={`${dict.name || 'Name'} *`}
+                  autoComplete="name"
+                  required
+                  value={applyForm.name}
+                  onChange={e => setApplyForm({ ...applyForm, name: e.target.value })}
+                />
               </div>
+
+              {/* Email */}
               <div>
-                <label className="form-label">{dict.email} *</label>
-                <input type="email" className="form-input" autoComplete="email" required value={applyForm.email} onChange={e => setApplyForm({ ...applyForm, email: e.target.value })} />
+                <input
+                  type="email"
+                  className="form-input"
+                  placeholder={`${dict.email || 'Email Address'} *`}
+                  autoComplete="email"
+                  required
+                  value={applyForm.email}
+                  onChange={e => setApplyForm({ ...applyForm, email: e.target.value })}
+                />
               </div>
+
+              {/* Phone */}
               <div>
-                <label className="form-label">{dict.uploadCV}</label>
-                <label className="cv-upload-area">
+                <input
+                  type="tel"
+                  className="form-input"
+                  placeholder={dict.phoneNumber || 'Phone Number'}
+                  autoComplete="tel"
+                  value={applyForm.phone}
+                  onChange={e => setApplyForm({ ...applyForm, phone: e.target.value })}
+                />
+              </div>
+
+              {/* Nationality */}
+              <div>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder={`${dict.nationality || 'Nationality'} *`}
+                  required
+                  value={applyForm.nationality}
+                  onChange={e => setApplyForm({ ...applyForm, nationality: e.target.value })}
+                />
+              </div>
+
+              {/* Date of Birth */}
+              <div>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder={`${dict.dob || 'Date of Birth'} * (DD.MM.YYYY)`}
+                  pattern="\d{2}\.\d{2}\.\d{4}"
+                  title="Format: DD.MM.YYYY"
+                  required
+                  value={applyForm.dob}
+                  onChange={e => setApplyForm({ ...applyForm, dob: e.target.value })}
+                />
+              </div>
+
+              {/* Position */}
+              <div>
+                <input
+                  type="text"
+                  className="form-input"
+                  placeholder={dict.position || 'Which position are you applying for?'}
+                  value={applyForm.position}
+                  onChange={e => setApplyForm({ ...applyForm, position: e.target.value })}
+                />
+              </div>
+
+              {/* Message */}
+              <div>
+                <textarea
+                  className="form-input"
+                  placeholder={dict.messageOrComment || 'Message or comment'}
+                  rows={4}
+                  value={applyForm.message}
+                  onChange={e => setApplyForm({ ...applyForm, message: e.target.value })}
+                />
+              </div>
+
+              {/* CV Upload */}
+              <div>
+                <label className="form-label text-sm text-gray-600">{dict.uploadCV || 'Upload CV (PDF)'}</label>
+                <label className="cv-upload-area mt-1">
                   {applyFile ? (
-                    <span className="cv-upload-text" style={{ color: 'var(--color-primary)', fontWeight: 'bold' }}>📄 {applyFile.name}</span>
+                    <span className="cv-upload-text" style={{ color: 'var(--primary)', fontWeight: 'bold' }}>
+                      📄 {applyFile.name}
+                    </span>
                   ) : (
                     <>
-                      <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="cv-upload-icon">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="cv-upload-icon">
                         <path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                       </svg>
-                      <span className="cv-upload-text">{dict.uploadBtn}</span>
+                      <span className="cv-upload-text">{dict.uploadBtn || 'Choose File'}</span>
                     </>
                   )}
-                  <input type="file" accept=".pdf" className="sr-only" onChange={e => {
-                    if (e.target.files && e.target.files.length > 0) {
-                      setApplyFile(e.target.files[0]);
-                    }
-                  }} />
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    className="sr-only"
+                    onChange={e => {
+                      if (e.target.files && e.target.files.length > 0) {
+                        setApplyFile(e.target.files[0])
+                      }
+                    }}
+                  />
                 </label>
               </div>
-              <button type="submit" className="btn-nav-primary w-full mt-1" disabled={applyLoading}>
-                {applyLoading ? 'Sending...' : dict.submitBtn}
+
+              <button type="submit" className="btn-nav-primary w-full mt-2" disabled={applyLoading}>
+                {applyLoading ? 'Sending...' : (dict.submitBtn || 'Submit Application')}
               </button>
             </form>
           </div>
