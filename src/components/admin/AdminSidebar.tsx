@@ -63,8 +63,13 @@ export default function AdminSidebar({ mobileOpen, onCloseMobile }: { mobileOpen
       {/* Logo */}
       <div className="admin-sidebar-logo">
         <Link href="/admin/dashboard" style={{ display: 'flex', alignItems: 'center', gap: '.625rem', textDecoration: 'none' }} onClick={onCloseMobile}>
-          <div className="logo-mark" style={{ width: 36, height: 36, fontSize: '1rem', flexShrink: 0 }}>J</div>
-          {!collapsed && <span className="logo-text" style={{ fontSize: '1.125rem', color: '#fff' }}>job<span>andu</span></span>}
+          {/* <div className="logo-mark" style={{ width: 36, height: 36, fontSize: '1rem', flexShrink: 0 }}>J</div>
+          {!collapsed && <span className="logo-text" style={{ fontSize: '1.125rem', color: '#fff' }}>job<span>andu</span></span>} */}
+          <img
+                src="https://jobandu.de/wp-content/uploads/2025/05/1.png"
+                alt="Jobandu"
+                className="navbar-logo"
+              />
         </Link>
         {/* <button className="admin-sidebar-toggle" onClick={() => setCollapsed(v => !v)} aria-label="Toggle sidebar">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

@@ -6,8 +6,8 @@ import Link from 'next/link'
 export default function DatenschutzPage({ params: { lang } }: { params: { lang: Locale } }) {
   const dict = getDictionary(lang)
 
-  const title = lang === 'de' ? 'Datenschutzerklärung' : lang === 'ro' ? 'Politica de confidențialitate' : 'Privacy Policy'
-  const homeLabel = lang === 'de' ? 'Start' : lang === 'ro' ? 'Acasă' : 'Home'
+  const title = lang === 'da' ? 'Privatlivspolitik' : 'Privacy Policy'
+  const homeLabel = lang === 'da' ? 'Hjem' : 'Home'
 
   return (
     <main>

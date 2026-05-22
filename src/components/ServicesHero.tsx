@@ -18,7 +18,7 @@ export default function ServicesHero({ dict, lang }: { dict: any; lang: string }
           <Link href={`/${lang}`} className="inner-hero-bc-link">Home</Link>
           <span className="inner-hero-bc-sep">›</span>
           <span className="inner-hero-bc-current">
-            {lang === 'de' ? 'Leistungen' : lang === 'ro' ? 'Servicii' : 'Services'}
+            {lang === 'da' ? 'Ydelser' : 'Services'}
           </span>
         </nav>
       </div>

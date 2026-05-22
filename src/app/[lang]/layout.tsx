@@ -2,12 +2,12 @@ import type { Metadata } from 'next'
 import '../globals.css'
 
 export const metadata: Metadata = {
-  title: 'Jobandu – Sofort verfügbare Hilfskräfte deutschlandweit',
-  description: 'Zuverlässige Zeitarbeit in Lager, Produktion & Transport. Heute beauftragen, morgen im Einsatz.',
+  title: 'Jobandu – Immediate Staff Availability Nationwide',
+  description: 'Reliable temporary staffing in warehousing, production & transport. Commission today, work tomorrow.',
 }
 
 export async function generateStaticParams() {
-  return [{ lang: 'de' }, { lang: 'en' }, { lang: 'ro' }]
+  return [{ lang: 'en' }, { lang: 'da' }]
 }
 
 export default function LangLayout({

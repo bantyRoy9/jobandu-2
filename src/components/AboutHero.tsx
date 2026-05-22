@@ -13,7 +13,7 @@ export default function AboutHero({ dict, lang }: { dict: any; lang: string }) {
           <Link href={`/${lang}`} className="inner-hero-bc-link">Home</Link>
           <span className="inner-hero-bc-sep">›</span>
           <span className="inner-hero-bc-current">
-            {lang === 'de' ? 'Über uns' : lang === 'ro' ? 'Despre noi' : 'About us'}
+            {lang === 'da' ? 'Om os' : 'About us'}
           </span>
         </nav>
       </div>

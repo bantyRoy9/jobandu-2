@@ -13,7 +13,7 @@ export default function ContactHero({ dict, lang }: { dict: any; lang: string })
           <Link href={`/${lang}`} className="inner-hero-bc-link">Home</Link>
           <span className="inner-hero-bc-sep">›</span>
           <span className="inner-hero-bc-current">
-            {lang === 'de' ? 'Kontakt' : lang === 'ro' ? 'Contact' : 'Contact'}
+            {lang === 'da' ? 'Kontakt' : 'Contact'}
           </span>
         </nav>
       </div>

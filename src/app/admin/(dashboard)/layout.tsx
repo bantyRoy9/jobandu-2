@@ -46,8 +46,11 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
         {/* Mobile Header Toggle */}
         <div className="admin-mobile-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', fontWeight: 700, fontSize: '1.25rem' }}>
-            <div className="logo-mark" style={{ width: 32, height: 32, fontSize: '.875rem' }}>J</div>
-            jobandu
+            <img
+                src="https://jobandu.de/wp-content/uploads/2025/05/1.png"
+                alt="Jobandu"
+                className="navbar-logo"
+              />
           </div>
           <button className="admin-mobile-toggle" onClick={() => setMobileOpen(true)}>
             ☰

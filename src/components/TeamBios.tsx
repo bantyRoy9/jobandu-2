@@ -27,7 +27,7 @@ export default function TeamBios({ dict, lang }: { dict: any; lang: string }) {
       members: [
         {
           name: 'Henning Nielsen',
-          role: lang === 'de' ? 'Geschäftsführer' : lang === 'ro' ? 'Director General' : 'Managing Director',
+          role: lang === 'da' ? 'Administrerende direktør' : 'Managing Director',
           email: 'hn@jobandu.de',
         },
       ],

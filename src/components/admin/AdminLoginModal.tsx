@@ -67,19 +67,25 @@ export default function AdminLoginModal({ onClose }: Props) {
         <button className="modal-close" onClick={onClose} aria-label="Close">✕</button>
 
         {/* Header */}
-        <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-          <div style={{ display: 'inline-flex', alignItems: 'center', gap: '.625rem', marginBottom: '1.25rem' }}>
-            <div className="logo-mark" style={{ width: 40, height: 40, fontSize: '1.125rem' }}>J</div>
+        <div style={{ textAlign: 'center', marginBottom: '.1rem' }}>
+          <div style={{ display: 'inline-flex', alignItems: 'center', }}>
+            {/* <div className="logo-mark" style={{ width: 40, height: 40, fontSize: '1.125rem' }}>J</div>
             <span className="logo-text" style={{ fontSize: '1.25rem', color: 'var(--color-text-primary)' }}>
               job<span>andu</span>
             </span>
-          </div>
-          <h2 style={{ fontSize: '1.375rem', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '.375rem' }}>
+          </div> */}
+          <img
+                src="https://jobandu.de/wp-content/uploads/2025/05/1.png"
+                alt="Jobandu"
+                className="navbar-logo"
+                style={{width:'100%'}}
+              /></div>
+          {/* <h2 style={{ fontSize: '1.375rem', fontWeight: 800, color: 'var(--color-text-primary)', marginBottom: '.375rem' }}>
             Admin Portal
           </h2>
           <p style={{ fontSize: '.875rem', color: 'var(--color-text-secondary)' }}>
             Sign in to manage applicants &amp; employers
-          </p>
+          </p> */}
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.125rem' }}>

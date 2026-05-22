@@ -58,10 +58,10 @@ export default function BewerberJobs({ dict, lang }: { dict: any; lang: string }
     }
   }
 
-  const applyLabel  = lang === 'de' ? 'Jetzt bewerben!' : lang === 'ro' ? 'Aplică acum!' : 'Apply now!'
-  const titleLabel  = lang === 'de' ? 'Stellentitel'    : lang === 'ro' ? 'Titlu'        : 'Job Title'
-  const locLabel    = lang === 'de' ? 'Standort'        : lang === 'ro' ? 'Locație'      : 'Location'
-  const appLabel    = lang === 'de' ? 'Bewerbung'       : lang === 'ro' ? 'Candidatură'  : 'Application'
+  const applyLabel = lang === 'da' ? 'Ansøg nu!' : 'Apply now!'
+  const titleLabel = lang === 'da' ? 'Stillingsbetegnelse' : 'Job Title'
+  const locLabel   = lang === 'da' ? 'Placering'          : 'Location'
+  const appLabel   = lang === 'da' ? 'Ansøgning'          : 'Application'
 
   return (
     <section id="stellenangebote" className="jobs-section">
@@ -141,16 +141,16 @@ export default function BewerberJobs({ dict, lang }: { dict: any; lang: string }
                   </svg>
                 </div>
                 <h4 className="modal-title">
-                  {lang === 'de' ? 'Bewerbung gesendet!' : lang === 'ro' ? 'Candidatură trimisă!' : 'Application Sent!'}
+                  {lang === 'da' ? 'Ansøgning sendt!' : 'Application Sent!'}
                 </h4>
                 <p className="modal-desc">
-                  {lang === 'de' ? 'Vielen Dank. Wir melden uns in Kürze.' : lang === 'ro' ? 'Vă mulțumim. Vă vom contacta în curând.' : 'Thank you. We will get back to you shortly.'}
+                  {lang === 'da' ? 'Tak. Vi vender tilbage til dig snarest.' : 'Thank you. We will get back to you shortly.'}
                 </p>
               </div>
             ) : (
               <>
                 <h3 className="modal-title">
-                  {lang === 'de' ? 'Bewerbung als' : lang === 'ro' ? 'Candidatură ca' : 'Apply as'}
+                  {lang === 'da' ? 'Ansøg som' : 'Apply as'}
                 </h3>
                 <p className="modal-job-name">{selectedJob.title}</p>
 
@@ -162,7 +162,7 @@ export default function BewerberJobs({ dict, lang }: { dict: any; lang: string }
                   )}
                   <div>
                     <label className="form-label">
-                      {lang === 'de' ? 'Vollständiger Name *' : lang === 'ro' ? 'Nume complet *' : 'Full Name *'}
+                      {lang === 'da' ? 'Fulde navn *' : 'Full Name *'}
                     </label>
                     <input type="text" required className="form-input" value={applyName} onChange={e => setApplyName(e.target.value)} />
                   </div>
@@ -172,7 +172,7 @@ export default function BewerberJobs({ dict, lang }: { dict: any; lang: string }
                   </div>
                   <div>
                     <label className="form-label">
-                      {lang === 'de' ? 'Lebenslauf (PDF) *' : lang === 'ro' ? 'CV (PDF) *' : 'CV (PDF) *'}
+                      {lang === 'da' ? 'CV (PDF) *' : 'CV (PDF) *'}
                     </label>
                     <label className="cv-upload-area">
                       {applyFile ? (
@@ -183,7 +183,7 @@ export default function BewerberJobs({ dict, lang }: { dict: any; lang: string }
                             <path d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
                           </svg>
                           <span className="cv-upload-text">
-                            {lang === 'de' ? 'PDF auswählen' : lang === 'ro' ? 'Alege PDF' : 'Select PDF'}
+                            {lang === 'da' ? 'Vælg PDF' : 'Select PDF'}
                           </span>
                         </>
                       )}
@@ -195,7 +195,7 @@ export default function BewerberJobs({ dict, lang }: { dict: any; lang: string }
                     </label>
                   </div>
                   <button type="submit" className="btn-primary w-full" disabled={loading}>
-                    {loading ? 'Sending...' : (lang === 'de' ? 'Bewerbung absenden' : lang === 'ro' ? 'Trimite candidatura' : 'Submit Application')}
+                    {loading ? 'Sending...' : (lang === 'da' ? 'Send ansøgning' : 'Submit Application')}
                   </button>
                 </form>
               </>

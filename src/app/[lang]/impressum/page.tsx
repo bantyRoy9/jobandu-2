@@ -6,8 +6,8 @@ import Link from 'next/link'
 export default function ImpressumPage({ params: { lang } }: { params: { lang: Locale } }) {
   const dict = getDictionary(lang)
 
-  const title = lang === 'de' ? 'Impressum' : lang === 'ro' ? 'Mențiuni legale' : 'Imprint'
-  const homeLabel = lang === 'de' ? 'Start' : lang === 'ro' ? 'Acasă' : 'Home'
+  const title = lang === 'da' ? 'Impressum' : 'Imprint'
+  const homeLabel = lang === 'da' ? 'Hjem' : 'Home'
 
   return (
     <main>

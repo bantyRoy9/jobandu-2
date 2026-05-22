@@ -16,7 +16,7 @@ export default function BewerberHero({ dict, lang }: { dict: any; lang: string }
           <Link href={`/${lang}`} className="inner-hero-bc-link">Home</Link>
           <span className="inner-hero-bc-sep">›</span>
           <span className="inner-hero-bc-current">
-            {lang === 'de' ? 'Für Bewerber' : lang === 'ro' ? 'Pentru Candidați' : 'For Applicants'}
+            {lang === 'da' ? 'For ansøgere' : 'For Applicants'}
           </span>
         </nav>
       </div>

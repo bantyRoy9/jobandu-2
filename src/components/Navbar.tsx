@@ -14,9 +14,8 @@ export default function Navbar({ dict, lang }: { dict: any; lang: string }) {
   ]
 
   const languages = [
-    { code: 'de', label: 'Deutsch', flag: '🇩🇪' },
     { code: 'en', label: 'English', flag: '🇬🇧' },
-    { code: 'ro', label: 'Română', flag: '🇷🇴' },
+    { code: 'da', label: 'Dansk',   flag: '🇩🇰' },
   ]
 
   const activeLang = languages.find(l => l.code === lang) || languages[0]
