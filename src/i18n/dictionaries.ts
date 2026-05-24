@@ -12,7 +12,7 @@ export const dictionaries = {
       title: 'Immediate Staff Availability – Nationwide',
       subtitle1: 'Reliable temporary work in warehousing, production & transport – hire today, start tomorrow.',
       subtitle2: ' Your strong partner for fast and flexible personnel solutions ',
-      subtitle3: 'across Germany.',
+      subtitle3: 'across Denmark.',
       btnApply: 'Apply Now', jobs: 'Vacancies', more: 'learn more',
       contactPerson: 'Contact persons', contact: 'Contact us'
     },
@@ -180,7 +180,7 @@ export const dictionaries = {
       title: 'Øjeblikkelig personale tilgængelighed – Landsdækkende',
       subtitle1: 'Pålidelig vikararbejde inden for lager, produktion og transport – bestil i dag, start i morgen.',
       subtitle2: ' Din stærke partner for hurtige og fleksible personalløsninger ',
-      subtitle3: 'i hele Tyskland.',
+      subtitle3: 'i hele danmark.',
       btnApply: 'Ansøg nu', jobs: 'Ledige stillinger', more: 'læs mere',
       contactPerson: 'Kontaktpersoner', contact: 'Kontakt os'
     },
