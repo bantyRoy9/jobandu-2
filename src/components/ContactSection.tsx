@@ -14,7 +14,7 @@ interface ContactData {
 }
 
 export default function ContactSection({ dict }: { dict: any }) {
-  const [form, setForm] = useState({ name: '', email: '', betreff: '', nachricht: '' })
+  const [form, setForm] = useState({ name: '', email: '', phone: '', betreff: '', nachricht: '' })
   const [mounted, setMounted] = useState(false)
   const [contactData, setContactData] = useState<ContactData | null>(null)
   const [loading, setLoading] = useState(false)
@@ -38,19 +38,19 @@ export default function ContactSection({ dict }: { dict: any }) {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!form.name || !form.email || !form.nachricht) {
+    if (!form.name || !form.email || !form.phone || !form.nachricht) {
       alert('Please fill all required fields.')
       return
     }
     setLoading(true)
     const payload = {
-      company_name: form.betreff || 'General Inquiry',
+      company_name:   form.betreff || 'General Inquiry',
       contact_person: form.name,
-      email: form.email,
-      phone: 'Not provided',
-      requirements: form.betreff ? [form.betreff] : ['General'],
-      location: 'Not provided',
-      notes: form.nachricht,
+      email:          form.email,
+      phone:          form.phone,
+      requirements:   form.betreff ? [form.betreff] : ['General Inquiry'],
+      location:       'Not specified',
+      notes:          form.nachricht,
     }
     try {
       const res = await fetch(`${PUBLIC_API_BASE}/employers`, {
@@ -63,7 +63,7 @@ export default function ContactSection({ dict }: { dict: any }) {
         try { const e = await res.json(); msg = e.detail || msg } catch { /* noop */ }
         throw new Error(msg)
       }
-      setForm({ name: '', email: '', betreff: '', nachricht: '' })
+      setForm({ name: '', email: '', phone: '', betreff: '', nachricht: '' })
       setSuccessMsg(dict.successMsg || "Message sent! We'll respond within 24 hours.")
       setTimeout(() => setSuccessMsg(''), 6000)
     } catch (err) {
@@ -164,6 +164,12 @@ export default function ContactSection({ dict }: { dict: any }) {
                 <input type="email" className="form-input" value={form.email} required
                   onChange={e => setForm({ ...form, email: e.target.value })} />
               </div>
+            </div>
+            <div className="form-row">
+              <label className="form-label">{dict.phoneLabel || 'Phone Number'} *</label>
+              <input type="tel" className="form-input" value={form.phone} required
+                placeholder="+49 123 456789"
+                onChange={e => setForm({ ...form, phone: e.target.value })} />
             </div>
             <div className="form-row">
               <label className="form-label">{dict.subjectLabel}</label>

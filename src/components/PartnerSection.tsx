@@ -12,7 +12,7 @@ interface Job {
 }
 
 const EMPTY_APPLY = { name: '', email: '', phone: '', experience_years: '', position: '' }
-const EMPTY_INQUIRY = { name: '', email: '', betreff: '', nachricht: '' }
+const EMPTY_INQUIRY = { name: '', company: '', email: '', phone: '', betreff: '', nachricht: '' }
 
 export default function PartnerSection({ dict }: { dict: any }) {
   const [activeJobs, setActiveJobs] = useState<Job[]>([])
@@ -97,7 +97,7 @@ export default function PartnerSection({ dict }: { dict: any }) {
   // ── Inquiry submit ──
   const handleInquirySubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!inquiryForm.name || !inquiryForm.email || !inquiryForm.nachricht) {
+    if (!inquiryForm.name || !inquiryForm.email || !inquiryForm.phone || !inquiryForm.nachricht) {
       setInquiryError('Please fill in all required fields.')
       return
     }
@@ -106,12 +106,12 @@ export default function PartnerSection({ dict }: { dict: any }) {
     setInquirySuccess('')
 
     const payload = {
-      company_name:   inquiryForm.betreff || 'Corporate Partner Lead',
+      company_name:   inquiryForm.company || inquiryForm.name,
       contact_person: inquiryForm.name,
       email:          inquiryForm.email,
-      phone:          'Not provided',
-      requirements:   inquiryForm.betreff ? [inquiryForm.betreff] : ['Corporate Partner Inquiry'],
-      location:       'Not provided',
+      phone:          inquiryForm.phone,
+      requirements:   inquiryForm.betreff ? [inquiryForm.betreff] : ['Staffing Request'],
+      location:       'Not specified',
       notes:          inquiryForm.nachricht,
     }
 
@@ -317,20 +317,39 @@ export default function PartnerSection({ dict }: { dict: any }) {
               <div className="form-row">
                 <label className="form-label">{dict.nameLabel}</label>
                 <input type="text" required className="form-input"
+                  placeholder={dict.nameLabel}
                   value={inquiryForm.name}
                   onChange={e => setInquiryForm(p => ({ ...p, name: e.target.value }))} />
               </div>
 
               <div className="form-row">
+                <label className="form-label">{dict.companyLabel || 'Company Name'}</label>
+                <input type="text" className="form-input"
+                  placeholder={dict.companyLabel || 'Company Name'}
+                  value={inquiryForm.company}
+                  onChange={e => setInquiryForm(p => ({ ...p, company: e.target.value }))} />
+              </div>
+
+              <div className="form-row">
                 <label className="form-label">{dict.emailLabel}</label>
                 <input type="email" required className="form-input"
+                  placeholder={dict.emailLabel}
                   value={inquiryForm.email}
                   onChange={e => setInquiryForm(p => ({ ...p, email: e.target.value }))} />
               </div>
 
               <div className="form-row">
+                <label className="form-label">{dict.phoneLabel} *</label>
+                <input type="tel" required className="form-input"
+                  placeholder="+49 123 456789"
+                  value={inquiryForm.phone}
+                  onChange={e => setInquiryForm(p => ({ ...p, phone: e.target.value }))} />
+              </div>
+
+              <div className="form-row">
                 <label className="form-label">{dict.subjectLabel}</label>
                 <input type="text" className="form-input"
+                  placeholder={dict.subjectLabel}
                   value={inquiryForm.betreff}
                   onChange={e => setInquiryForm(p => ({ ...p, betreff: e.target.value }))} />
               </div>

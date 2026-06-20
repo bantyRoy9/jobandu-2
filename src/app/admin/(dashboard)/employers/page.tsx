@@ -2,18 +2,24 @@
 import { useEffect, useState, useCallback } from 'react';
 import { getEmployers, updateEmployer, deleteEmployer, type Employer } from '@/lib/admin-api';
 
-const STATUS_OPTIONS = ['pending', 'reviewing', 'approved', 'rejected', 'closed'];
+const STATUS_OPTIONS = ['open', 'in_progress', 'closed'];
+const STATUS_LABELS: Record<string, string> = {
+  open:        'Open',
+  in_progress: 'In Progress',
+  closed:      'Closed',
+};
 const STATUS_COLORS: Record<string, string> = {
-  pending: '#f59e0b', reviewing: '#3b82f6', approved: '#10b981',
-  rejected: '#ef4444', closed: '#64748b',
+  open:        '#f59e0b',
+  in_progress: '#3b82f6',
+  closed:      '#64748b',
 };
 
 function StatusBadge({ status }: { status?: string }) {
-  const s = status ?? 'unknown';
+  const s = status ?? 'open';
   const color = STATUS_COLORS[s] ?? '#64748b';
   return (
     <span style={{ padding: '2px 10px', fontSize: '.7rem', fontWeight: 600, borderRadius: 9999, background: `${color}1a`, color }}>
-      {s.charAt(0).toUpperCase() + s.slice(1)}
+      {STATUS_LABELS[s] ?? s}
     </span>
   );
 }
@@ -119,7 +125,7 @@ export default function EmployersPage() {
         <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
           <select className="form-select" value={filterStatus} onChange={e => setFilterStatus(e.target.value)} style={{ width: 'auto', minWidth: 160, borderRadius: '0.875rem', background: '#fff' }}>
             <option value="">All Statuses</option>
-            {STATUS_OPTIONS.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
+            {STATUS_OPTIONS.map(s => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}
           </select>
           <button className="btn btn-primary hover-lift" onClick={load} style={{ borderRadius: '0.875rem', padding: '0 1.25rem' }}>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="23 4 23 10 17 10" /><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10" /></svg>
@@ -178,13 +184,13 @@ export default function EmployersPage() {
                   <td>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                       <select
-                        value={e.status ?? ''}
+                        value={e.status ?? 'open'}
                         onChange={ev => handleStatusChange(e.id, ev.target.value)}
                         disabled={updating === e.id}
                         className="form-select"
-                        style={{ padding: '4px 10px', fontSize: '.75rem', minWidth: 120, borderRadius: '8px', border: '1px solid #e2e8f0' }}
+                        style={{ padding: '4px 10px', fontSize: '.75rem', minWidth: 130, borderRadius: '8px', border: '1px solid #e2e8f0' }}
                       >
-                        {STATUS_OPTIONS.map(s => <option key={s} value={s}>{s.charAt(0).toUpperCase() + s.slice(1)}</option>)}
+                        {STATUS_OPTIONS.map(s => <option key={s} value={s}>{STATUS_LABELS[s]}</option>)}
                       </select>
                       <StatusBadge status={e.status} />
                     </div>
