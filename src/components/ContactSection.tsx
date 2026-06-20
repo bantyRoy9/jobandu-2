@@ -1,14 +1,40 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { PUBLIC_API_BASE } from '@/lib/admin-api'
+import { PUBLIC_API_BASE, CONTENT_API_BASE } from '@/lib/admin-api'
+
+interface ContactData {
+  id?: string
+  company_name: string
+  street: string
+  zip_code: string
+  city: string
+  country: string
+  phone: string
+  email: string
+}
 
 export default function ContactSection({ dict }: { dict: any }) {
   const [form, setForm] = useState({ name: '', email: '', betreff: '', nachricht: '' })
   const [mounted, setMounted] = useState(false)
-  useEffect(() => { setMounted(true) }, [])
-
+  const [contactData, setContactData] = useState<ContactData | null>(null)
   const [loading, setLoading] = useState(false)
   const [successMsg, setSuccessMsg] = useState('')
+
+  useEffect(() => {
+    setMounted(true)
+    fetch(`${CONTENT_API_BASE}/contact`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data && !data.error) setContactData(data) })
+      .catch(() => {})
+  }, [])
+
+  // Derived contact values — API data with hardcoded fallbacks
+  const phone       = contactData?.phone    || '+49 (0) 65619451-144'
+  const email       = contactData?.email    || 'info@jobandu.de'
+  const addressLine1 = contactData?.street  || 'Johannes-Kepler-Str. 7'
+  const addressLine2 = contactData
+    ? `${contactData.zip_code} ${contactData.city}`
+    : '54634 Bitburg'
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -17,7 +43,6 @@ export default function ContactSection({ dict }: { dict: any }) {
       return
     }
     setLoading(true)
-    
     const payload = {
       company_name: form.betreff || 'General Inquiry',
       contact_person: form.name,
@@ -27,25 +52,17 @@ export default function ContactSection({ dict }: { dict: any }) {
       location: 'Not provided',
       notes: form.nachricht,
     }
-    
     try {
       const res = await fetch(`${PUBLIC_API_BASE}/employers`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
-      });
-
+      })
       if (!res.ok) {
-        let msg = `Error ${res.status}`;
-        try {
-          const errData = await res.json();
-          msg = errData.detail || msg;
-        } catch {
-          /* noop */
-        }
-        throw new Error(msg);
+        let msg = `Error ${res.status}`
+        try { const e = await res.json(); msg = e.detail || msg } catch { /* noop */ }
+        throw new Error(msg)
       }
-      
       setForm({ name: '', email: '', betreff: '', nachricht: '' })
       setSuccessMsg(dict.successMsg || "Message sent! We'll respond within 24 hours.")
       setTimeout(() => setSuccessMsg(''), 6000)
@@ -59,7 +76,7 @@ export default function ContactSection({ dict }: { dict: any }) {
   const infoCards = [
     {
       label: dict.address,
-      value: 'Johannes-Kepler-Str. 7\n54634 Bitburg',
+      value: `${addressLine1}\n${addressLine2}`,
       href: undefined as string | undefined,
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -79,8 +96,8 @@ export default function ContactSection({ dict }: { dict: any }) {
     },
     {
       label: dict.email,
-      value: 'info@jobandu.de',
-      href: 'mailto:info@jobandu.de',
+      value: email,
+      href: `mailto:${email}`,
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/>
@@ -89,8 +106,8 @@ export default function ContactSection({ dict }: { dict: any }) {
     },
     {
       label: dict.phone,
-      value: '+49 (0) 65619451-144',
-      href: 'tel:+4965619451144',
+      value: phone,
+      href: `tel:${phone.replace(/[\s()/-]/g, '')}`,
       icon: (
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 012 .18h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
@@ -103,14 +120,11 @@ export default function ContactSection({ dict }: { dict: any }) {
     <section id="kontakt" className="contact-section">
       <div className="section-container">
 
-        {/* ── Section heading ── */}
         <h2 className="section-heading">{dict.title}</h2>
         <div className="divider" />
-
-        {/* ── Callout line matching live site ── */}
         <p className="contact-callout">{dict.desc}</p>
 
-        {/* ── 4 info cards in a single row ── */}
+        {/* 4 info cards */}
         <div className="contact-info-row">
           {infoCards.map((card, i) => (
             <div key={i} className="contact-info-card">
@@ -131,10 +145,8 @@ export default function ContactSection({ dict }: { dict: any }) {
           ))}
         </div>
 
-        {/* ── Form + Map side by side ── */}
+        {/* Form + Map */}
         <div className="contact-grid">
-
-          {/* Left: contact form */}
           <form className="contact-form-box" onSubmit={handleSubmit}>
             {successMsg && (
               <div style={{ background: '#d4edda', color: '#155724', padding: '12px', borderRadius: '4px', marginBottom: '16px' }}>
@@ -165,11 +177,10 @@ export default function ContactSection({ dict }: { dict: any }) {
                 onChange={e => setForm({ ...form, nachricht: e.target.value })} />
             </div>
             <button type="submit" className="btn-primary w-full" disabled={loading}>
-              {loading ? 'Sending...' : dict.submitBtn}
+              {loading ? 'Sending…' : dict.submitBtn}
             </button>
           </form>
 
-          {/* Right: Google Map */}
           <div className="contact-map">
             {mounted && (
               <iframe
@@ -184,7 +195,6 @@ export default function ContactSection({ dict }: { dict: any }) {
               />
             )}
           </div>
-
         </div>
       </div>
     </section>

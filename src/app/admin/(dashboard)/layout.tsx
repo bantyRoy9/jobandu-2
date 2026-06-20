@@ -47,7 +47,7 @@ export default function AdminDashboardLayout({ children }: { children: React.Rea
         <div className="admin-mobile-header">
           <div style={{ display: 'flex', alignItems: 'center', gap: '.5rem', fontWeight: 700, fontSize: '1.25rem' }}>
             <img
-                src="https://jobandu.de/wp-content/uploads/2025/05/1.png"
+                src="/images/logo.png"
                 alt="Jobandu"
                 className="navbar-logo"
               />

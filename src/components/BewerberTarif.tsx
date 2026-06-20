@@ -10,7 +10,7 @@ export default function BewerberTarif({ dict }: { dict: any }) {
             <p>{dict.tarifDesc2}</p>
           </div>
           <a
-            href="https://jobandu.de/wp-content/uploads/2025/05/2023-03-13_iGZ_Arbeitsvertrag-Muster-unveraendert.pdf"
+            href="/images/igz-tarifvertrag.pdf"
             target="_blank"
             rel="noopener noreferrer"
             className="tarif-btn"

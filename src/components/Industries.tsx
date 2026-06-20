@@ -3,17 +3,17 @@ export default function Industries({ dict }: { dict: any }) {
     {
       title: dict.ind1Title,
       desc: dict.ind1Desc,
-      img: 'https://jobandu.de/wp-content/uploads/2025/05/0fee25c922f61800938d163c2321999b.jpg',
+      img: '/images/industry-warehouse.jpg',
     },
     {
       title: dict.ind2Title,
       desc: dict.ind2Desc,
-      img: 'https://jobandu.de/wp-content/uploads/2025/05/lkw.jpg',
+      img: '/images/industry-truck.jpg',
     },
     {
       title: dict.ind3Title,
       desc: dict.ind3Desc,
-      img: 'https://jobandu.de/wp-content/uploads/2025/05/Industrie-scaled.jpg',
+      img: '/images/industry-welder.jpg',
     },
   ]
 

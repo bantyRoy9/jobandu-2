@@ -2,6 +2,7 @@ import { authHeaders } from './admin-auth';
 
 export const API_BASE = process.env.NEXT_PUBLIC_API_BASE || 'https://jobandubackend.up.railway.app/api/admin';
 export const PUBLIC_API_BASE = API_BASE.replace('/admin', '');
+export const CONTENT_API_BASE = PUBLIC_API_BASE + '/content';
 
 type FetchOptions = RequestInit & { params?: Record<string, string> };
 
@@ -109,3 +110,92 @@ export interface SendEmailPayload {
 }
 export const sendEmail = (payload: SendEmailPayload) =>
   adminFetch('/send-email', { method: 'POST', body: JSON.stringify(payload) });
+
+/* =================== CONTENT: CONTACT =================== */
+export interface ContactContent {
+  id?: string;
+  company_name: string;
+  street: string;
+  zip_code: string;
+  city: string;
+  country: string;
+  phone: string;
+  email: string;
+}
+
+/** Public GET — no auth required */
+export const getContentContact = () =>
+  fetch(`${CONTENT_API_BASE}/contact`)
+    .then(r => { if (!r.ok) throw new Error(`Error ${r.status}`); return r.json() as Promise<ContactContent>; });
+
+/** Admin PUT — auth required */
+export const putContentContact = (body: Omit<ContactContent, 'id'>) =>
+  adminFetch<ContactContent>('/content/contact', {
+    method: 'PUT',
+    body: JSON.stringify(body),
+  });
+
+/* =================== CONTENT: TEAM =================== */
+export interface TeamMember {
+  id: string;
+  name: string;
+  role: string;
+  department: string;
+  phone?: string | null;
+  email: string;
+}
+
+/** Public GET — no auth required */
+export const getContentTeam = () =>
+  fetch(`${CONTENT_API_BASE}/team`)
+    .then(r => { if (!r.ok) throw new Error(`Error ${r.status}`); return r.json() as Promise<TeamMember[]>; });
+
+/** Admin POST — auth required */
+export const addTeamMember = (body: Omit<TeamMember, 'id'>) =>
+  adminFetch<TeamMember>('/content/team', {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+
+/** Admin PATCH — auth required */
+export const updateTeamMember = (id: string, body: Omit<TeamMember, 'id'>) =>
+  adminFetch<TeamMember>(`/content/team/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(body),
+  });
+
+/** Admin DELETE — auth required */
+export const deleteTeamMember = (id: string) =>
+  adminFetch(`/content/team/${id}`, { method: 'DELETE' });
+
+/* =================== CONTENT: JOBS =================== */
+export interface JobContent {
+  id: string;
+  title: string;
+  location: string;
+  apply_url?: string | null;
+  is_active: boolean;
+}
+
+/** Public GET — no auth required */
+export const getContentJobs = () =>
+  fetch(`${CONTENT_API_BASE}/jobs`)
+    .then(r => { if (!r.ok) throw new Error(`Error ${r.status}`); return r.json() as Promise<JobContent[]>; });
+
+/** Admin POST — auth required */
+export const addJob = (body: Omit<JobContent, 'id'>) =>
+  adminFetch<JobContent>('/content/jobs', {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+
+/** Admin PATCH — auth required */
+export const updateJob = (id: string, body: Omit<JobContent, 'id'>) =>
+  adminFetch<JobContent>(`/content/jobs/${id}`, {
+    method: 'PATCH',
+    body: JSON.stringify(body),
+  });
+
+/** Admin DELETE — auth required */
+export const deleteJob = (id: string) =>
+  adminFetch(`/content/jobs/${id}`, { method: 'DELETE' });

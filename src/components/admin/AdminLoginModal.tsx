@@ -75,7 +75,7 @@ export default function AdminLoginModal({ onClose }: Props) {
             </span>
           </div> */}
           <img
-                src="https://jobandu.de/wp-content/uploads/2025/05/1.png"
+                src="/images/logo.png"
                 alt="Jobandu"
                 className="navbar-logo"
                 style={{width:'100%'}}

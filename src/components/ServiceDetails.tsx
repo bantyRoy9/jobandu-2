@@ -33,7 +33,7 @@ export default function ServiceDetails({ dict }: { dict: any }) {
           </div>
           <div className="lg:w-2/5 h-64 lg:h-auto min-h-[300px] relative">
             <img 
-              src="https://jobandu.de/wp-content/uploads/2025/05/zeitarbeitt.png" 
+              src="/images/service-zeitarbeit.png" 
               alt={dict.s1Title}
               className="absolute inset-0 w-full h-full object-cover"
             />
@@ -68,7 +68,7 @@ export default function ServiceDetails({ dict }: { dict: any }) {
           </div>
           <div className="lg:w-2/5 h-64 lg:h-auto min-h-[300px] relative">
             <img 
-              src="https://jobandu.de/wp-content/uploads/2025/05/tryandhire-2048x1365.jpg" 
+              src="/images/service-tryandhire-lg.jpg" 
               alt={dict.s2Title}
               className="absolute inset-0 w-full h-full object-cover"
             />
@@ -103,7 +103,7 @@ export default function ServiceDetails({ dict }: { dict: any }) {
           </div>
           <div className="lg:w-2/5 h-64 lg:h-auto min-h-[300px] relative">
             <img 
-              src="https://jobandu.de/wp-content/uploads/2025/05/recruiting-2048x1850.jpg" 
+              src="/images/service-recruiting-lg.jpg" 
               alt={dict.s3Title}
               className="absolute inset-0 w-full h-full object-cover"
             />

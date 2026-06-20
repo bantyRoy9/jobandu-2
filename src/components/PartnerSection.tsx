@@ -1,131 +1,139 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { PUBLIC_API_BASE } from '@/lib/admin-api'
 
+const BACKEND = 'https://jobandubackend.up.railway.app/api'
+
+interface Job {
+  id: string
+  title: string
+  location: string
+  is_active: boolean
+}
+
+const EMPTY_APPLY = { name: '', email: '', phone: '', experience_years: '', position: '' }
+const EMPTY_INQUIRY = { name: '', email: '', betreff: '', nachricht: '' }
+
 export default function PartnerSection({ dict }: { dict: any }) {
-  const [applyForm, setApplyForm] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    nationality: '',
-    dob: '',
-    position: '',
-    message: '',
-  })
-  const [applyFile, setApplyFile] = useState<File | null>(null)
+  const [activeJobs, setActiveJobs] = useState<Job[]>([])
+
+  // ── Apply form state ──
+  const [applyForm, setApplyForm] = useState(EMPTY_APPLY)
+  const [applyFile, setApplyFile]     = useState<File | null>(null)
   const [applyLoading, setApplyLoading] = useState(false)
   const [applySuccess, setApplySuccess] = useState('')
-  const [applyError, setApplyError] = useState('')
+  const [applyError,   setApplyError]   = useState('')
 
-  const [inquiryForm, setInquiryForm] = useState({ name: '', email: '', betreff: '', nachricht: '' })
+  // ── Inquiry form state ──
+  const [inquiryForm, setInquiryForm]     = useState(EMPTY_INQUIRY)
   const [inquiryLoading, setInquiryLoading] = useState(false)
   const [inquirySuccess, setInquirySuccess] = useState('')
-  const [inquiryError, setInquiryError] = useState('')
+  const [inquiryError,   setInquiryError]   = useState('')
 
+  // Fetch active jobs for the position dropdown
+  useEffect(() => {
+    fetch(`${BACKEND}/content/jobs`)
+      .then(r => r.ok ? r.json() : [])
+      .then((data: Job[]) => setActiveJobs(Array.isArray(data) ? data.filter(j => j.is_active) : []))
+      .catch(() => {})
+  }, [])
+
+  // ── Apply submit ──
   const handleApplySubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!applyForm.name || !applyForm.email || !applyForm.nationality || !applyForm.dob) {
-      alert('Please fill all required fields.');
-      return;
+    e.preventDefault()
+    setApplyError('')
+
+    // Client-side validation for all required API fields
+    if (!applyForm.name.trim() || !applyForm.email.trim() || !applyForm.phone.trim()) {
+      setApplyError('Please fill in all required fields.')
+      return
     }
-    setApplyLoading(true);
-    setApplyError('');
-    setApplySuccess('');
+    const expYears = parseInt(applyForm.experience_years, 10)
+    if (isNaN(expYears) || expYears < 0) {
+      setApplyError('Please enter a valid number of experience years.')
+      return
+    }
 
-    const fd = new FormData();
-    fd.append('name', applyForm.name);
-    fd.append('email', applyForm.email);
-    fd.append('phone', applyForm.phone);
-    fd.append('nationality', applyForm.nationality);
-    fd.append('dob', applyForm.dob);
-    fd.append('position', applyForm.position);
-    fd.append('message', applyForm.message);
-    fd.append('location', 'Not specified');
-    fd.append('skills', JSON.stringify(['Corporate Partnership Application']));
-    fd.append('experience_years', '0');
+    setApplyLoading(true)
 
+    // Find the selected job to inherit its location
+    const selectedJob = activeJobs.find(j => j.title === applyForm.position)
+
+    const fd = new FormData()
+    fd.append('name',             applyForm.name.trim())
+    fd.append('email',            applyForm.email.trim())
+    fd.append('phone',            applyForm.phone.trim())
+    fd.append('skills',           JSON.stringify(
+      applyForm.position ? [applyForm.position] : ['General Application']
+    ))
+    fd.append('experience_years', String(expYears))
+    fd.append('location',         selectedJob?.location || 'Not specified')
     if (applyFile) {
       if (applyFile.size > 5 * 1024 * 1024) {
-        setApplyError('File too large. Maximum size is 5MB.');
-        setApplyLoading(false);
-        return;
+        setApplyError('File too large. Maximum size is 5MB.')
+        setApplyLoading(false)
+        return
       }
-      fd.append('cv', applyFile);
+      fd.append('cv', applyFile)
     }
 
     try {
-      const res = await fetch(`${PUBLIC_API_BASE}/applicants/`, {
-        method: 'POST',
-        body: fd,
-      });
-
+      const res = await fetch(`${PUBLIC_API_BASE}/applicants/`, { method: 'POST', body: fd })
       if (!res.ok) {
-        let msg = `Error ${res.status}`;
-        try {
-          const errData = await res.json();
-          msg = errData.detail || msg;
-        } catch {
-          /* noop */
-        }
-        throw new Error(msg);
+        let msg = `Error ${res.status}`
+        try { const d = await res.json(); msg = d.detail || msg } catch { /* noop */ }
+        throw new Error(msg)
       }
-
-      setApplySuccess(dict.successMsg || 'Application sent successfully!');
-      setApplyForm({ name: '', email: '', phone: '', nationality: '', dob: '', position: '', message: '' });
-      setApplyFile(null);
+      setApplySuccess(dict.successMsg || 'Application sent successfully!')
+      setApplyForm(EMPTY_APPLY)
+      setApplyFile(null)
     } catch (err) {
-      setApplyError((err as Error).message || 'Something went wrong. Please try again.');
+      setApplyError((err as Error).message || 'Something went wrong. Please try again.')
     } finally {
-      setApplyLoading(false);
+      setApplyLoading(false)
     }
-  };
+  }
 
+  // ── Inquiry submit ──
   const handleInquirySubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     if (!inquiryForm.name || !inquiryForm.email || !inquiryForm.nachricht) {
-      alert('Please fill all required fields.');
-      return;
+      setInquiryError('Please fill in all required fields.')
+      return
     }
-    setInquiryLoading(true);
-    setInquiryError('');
-    setInquirySuccess('');
+    setInquiryLoading(true)
+    setInquiryError('')
+    setInquirySuccess('')
 
     const payload = {
-      company_name: inquiryForm.betreff || 'Corporate Partner Lead',
+      company_name:   inquiryForm.betreff || 'Corporate Partner Lead',
       contact_person: inquiryForm.name,
-      email: inquiryForm.email,
-      phone: 'Not provided',
-      requirements: inquiryForm.betreff ? [inquiryForm.betreff] : ['Corporate Partner Inquiry'],
-      location: 'Not provided',
-      notes: inquiryForm.nachricht,
-    };
+      email:          inquiryForm.email,
+      phone:          'Not provided',
+      requirements:   inquiryForm.betreff ? [inquiryForm.betreff] : ['Corporate Partner Inquiry'],
+      location:       'Not provided',
+      notes:          inquiryForm.nachricht,
+    }
 
     try {
       const res = await fetch(`${PUBLIC_API_BASE}/employers`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
-      });
-
+      })
       if (!res.ok) {
-        let msg = `Error ${res.status}`;
-        try {
-          const errData = await res.json();
-          msg = errData.detail || msg;
-        } catch {
-          /* noop */
-        }
-        throw new Error(msg);
+        let msg = `Error ${res.status}`
+        try { const d = await res.json(); msg = d.detail || msg } catch { /* noop */ }
+        throw new Error(msg)
       }
-
-      setInquirySuccess(dict.successMsg || "Message sent! We'll respond within 24 hours.");
-      setInquiryForm({ name: '', email: '', betreff: '', nachricht: '' });
+      setInquirySuccess(dict.inquirySuccessMsg || "Message sent! We'll respond within 24 hours.")
+      setInquiryForm(EMPTY_INQUIRY)
     } catch (err) {
-      setInquiryError((err as Error).message || 'Something went wrong. Please try again.');
+      setInquiryError((err as Error).message || 'Something went wrong. Please try again.')
     } finally {
-      setInquiryLoading(false);
+      setInquiryLoading(false)
     }
-  };
+  }
 
   return (
     <section id="jetzt-anfragen" className="partner-section">
@@ -140,7 +148,9 @@ export default function PartnerSection({ dict }: { dict: any }) {
 
         <div className="partner-grid">
 
-          {/* ── Apply form ── */}
+          {/* ════════════════════════════════════
+              Apply form
+          ════════════════════════════════════ */}
           <div id="jetzt-bewerben" className="partner-card">
             <div className="partner-card-head">
               <div className="partner-card-icon">
@@ -154,85 +164,96 @@ export default function PartnerSection({ dict }: { dict: any }) {
             <p className="partner-card-desc">{dict.applyDesc}</p>
 
             <form onSubmit={handleApplySubmit} className="partner-form">
+
               {applySuccess && (
-                <div style={{ background: '#d4edda', color: '#155724', padding: '12px', borderRadius: '4px', marginBottom: '8px', fontSize: '0.875rem' }}>
+                <div style={{ background: '#d4edda', color: '#155724', padding: '12px', borderRadius: '6px', marginBottom: '12px', fontSize: '0.875rem' }}>
                   {applySuccess}
                 </div>
               )}
               {applyError && (
-                <div style={{ background: '#f8d7da', color: '#721c24', padding: '12px', borderRadius: '4px', marginBottom: '8px', fontSize: '0.875rem' }}>
+                <div style={{ background: '#f8d7da', color: '#721c24', padding: '12px', borderRadius: '6px', marginBottom: '12px', fontSize: '0.875rem' }}>
                   {applyError}
                 </div>
               )}
 
-              {/* Name */}
+              {/* Name — required */}
               <div className="form-row">
                 <label className="form-label">{dict.nameLabel}</label>
-                <input type="text" className="form-input" required
+                <input
+                  type="text"
+                  required
+                  className="form-input"
                   placeholder={dict.nameLabel}
                   value={applyForm.name}
-                  onChange={e => setApplyForm({ ...applyForm, name: e.target.value })} />
+                  onChange={e => setApplyForm(p => ({ ...p, name: e.target.value }))}
+                />
               </div>
 
-              {/* Email */}
+              {/* Email — required */}
               <div className="form-row">
                 <label className="form-label">{dict.emailLabel}</label>
-                <input type="email" className="form-input" required
+                <input
+                  type="email"
+                  required
+                  className="form-input"
                   placeholder={dict.emailLabel}
                   value={applyForm.email}
-                  onChange={e => setApplyForm({ ...applyForm, email: e.target.value })} />
+                  onChange={e => setApplyForm(p => ({ ...p, email: e.target.value }))}
+                />
               </div>
 
-              {/* Phone */}
+              {/* Phone — required by API */}
               <div className="form-row">
-                <label className="form-label">{dict.phoneLabel || 'Telefonnummer'}</label>
-                <input type="tel" className="form-input"
-                  placeholder={dict.phoneLabel || 'Telefonnummer'}
+                <label className="form-label">{dict.phoneLabel} *</label>
+                <input
+                  type="tel"
+                  required
+                  className="form-input"
+                  placeholder="+49 123 456789"
                   value={applyForm.phone}
-                  onChange={e => setApplyForm({ ...applyForm, phone: e.target.value })} />
+                  onChange={e => setApplyForm(p => ({ ...p, phone: e.target.value }))}
+                />
               </div>
 
-              {/* Nationality */}
+              {/* Experience years — required by API */}
               <div className="form-row">
-                <label className="form-label">{dict.nationalityLabel || 'Nationalität'} *</label>
-                <input type="text" className="form-input" required
-                  placeholder={`${dict.nationalityLabel || 'Nationalität'} *`}
-                  value={applyForm.nationality}
-                  onChange={e => setApplyForm({ ...applyForm, nationality: e.target.value })} />
+                <label className="form-label">{dict.expYearsLabel || 'Years of Experience *'}</label>
+                <input
+                  type="number"
+                  required
+                  min={0}
+                  max={50}
+                  className="form-input"
+                  placeholder="0"
+                  value={applyForm.experience_years}
+                  onChange={e => setApplyForm(p => ({ ...p, experience_years: e.target.value }))}
+                />
               </div>
 
-              {/* Date of Birth */}
+              {/* Position — maps to skills[] in API, auto-fills location */}
               <div className="form-row">
-                <label className="form-label">{dict.dobLabel || 'Geburtsdatum'} * (DD.MM.YYYY)</label>
-                <input type="text" className="form-input" required
-                  placeholder={`${dict.dobLabel || 'Geburtsdatum'} * (DD.MM.YYYY)`}
-                  pattern="\d{2}\.\d{2}\.\d{4}"
-                  title="Format: DD.MM.YYYY"
-                  value={applyForm.dob}
-                  onChange={e => setApplyForm({ ...applyForm, dob: e.target.value })} />
-              </div>
-
-              {/* Position */}
-              <div className="form-row">
-                <label className="form-label">{dict.positionLabel || 'Für welche Stelle bewerben Sie sich?'}</label>
-                <input type="text" className="form-input"
-                  placeholder={dict.positionLabel || 'Für welche Stelle bewerben Sie sich?'}
+                <label className="form-label">{dict.positionLabel}</label>
+                <select
+                  className="form-input"
                   value={applyForm.position}
-                  onChange={e => setApplyForm({ ...applyForm, position: e.target.value })} />
+                  onChange={e => setApplyForm(p => ({ ...p, position: e.target.value }))}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <option value="">{dict.positionPlaceholder || '— Select a position —'}</option>
+                  {activeJobs.map(job => (
+                    <option key={job.id} value={job.title}>
+                      {job.title}{job.location ? ` – ${job.location}` : ''}
+                    </option>
+                  ))}
+                </select>
               </div>
 
-              {/* Message */}
+              {/* CV Upload — optional */}
               <div className="form-row">
-                <label className="form-label">{dict.messageLabel || 'Nachricht oder Kommentar'}</label>
-                <textarea className="form-input" rows={4}
-                  placeholder={dict.messageLabel || 'Nachricht oder Kommentar'}
-                  value={applyForm.message}
-                  onChange={e => setApplyForm({ ...applyForm, message: e.target.value })} />
-              </div>
-
-              {/* CV Upload */}
-              <div className="form-row">
-                <label className="form-label">{dict.cvLabel}</label>
+                <label className="form-label">
+                  {dict.cvLabel}{' '}
+                  <span style={{ fontWeight: 400, color: '#999', fontSize: '0.8em' }}>({dict.cvOptionalLabel || 'optional'})</span>
+                </label>
                 <label className="cv-drop-zone">
                   {applyFile ? (
                     <span className="cv-drop-text" style={{ color: 'var(--primary)', fontWeight: 'bold' }}>
@@ -248,19 +269,26 @@ export default function PartnerSection({ dict }: { dict: any }) {
                       </span>
                     </>
                   )}
-                  <input type="file" accept=".pdf" className="sr-only" onChange={e => {
-                    if (e.target.files && e.target.files.length > 0) setApplyFile(e.target.files[0])
-                  }} />
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    className="sr-only"
+                    onChange={e => {
+                      if (e.target.files?.[0]) setApplyFile(e.target.files[0])
+                    }}
+                  />
                 </label>
               </div>
 
               <button type="submit" className="btn-primary w-full" disabled={applyLoading}>
-                {applyLoading ? 'Sending...' : dict.submitBtn}
+                {applyLoading ? 'Sending…' : dict.submitBtn}
               </button>
             </form>
           </div>
 
-          {/* ── Inquiry form ── */}
+          {/* ════════════════════════════════════
+              Inquiry form
+          ════════════════════════════════════ */}
           <div className="partner-card">
             <div className="partner-card-head">
               <div className="partner-card-icon">
@@ -274,6 +302,7 @@ export default function PartnerSection({ dict }: { dict: any }) {
             <p className="partner-card-desc">{dict.inquiryDesc}</p>
 
             <form onSubmit={handleInquirySubmit} className="partner-form">
+
               {inquirySuccess && (
                 <div style={{ background: '#d4edda', color: '#155724', padding: '12px', borderRadius: '8px', marginBottom: '16px', fontSize: '0.875rem' }}>
                   {inquirySuccess}
@@ -284,29 +313,38 @@ export default function PartnerSection({ dict }: { dict: any }) {
                   {inquiryError}
                 </div>
               )}
+
               <div className="form-row">
                 <label className="form-label">{dict.nameLabel}</label>
-                <input type="text" className="form-input" required value={inquiryForm.name}
-                  onChange={e => setInquiryForm({...inquiryForm, name: e.target.value})} />
+                <input type="text" required className="form-input"
+                  value={inquiryForm.name}
+                  onChange={e => setInquiryForm(p => ({ ...p, name: e.target.value }))} />
               </div>
+
               <div className="form-row">
                 <label className="form-label">{dict.emailLabel}</label>
-                <input type="email" className="form-input" required value={inquiryForm.email}
-                  onChange={e => setInquiryForm({...inquiryForm, email: e.target.value})} />
+                <input type="email" required className="form-input"
+                  value={inquiryForm.email}
+                  onChange={e => setInquiryForm(p => ({ ...p, email: e.target.value }))} />
               </div>
+
               <div className="form-row">
                 <label className="form-label">{dict.subjectLabel}</label>
-                <input type="text" className="form-input" value={inquiryForm.betreff}
-                  onChange={e => setInquiryForm({...inquiryForm, betreff: e.target.value})} />
+                <input type="text" className="form-input"
+                  value={inquiryForm.betreff}
+                  onChange={e => setInquiryForm(p => ({ ...p, betreff: e.target.value }))} />
               </div>
+
               <div className="form-row">
                 <label className="form-label">{dict.msgLabel}</label>
-                <textarea className="form-input" rows={4} placeholder={dict.msgPlaceholder} required
+                <textarea className="form-input" rows={5} required
+                  placeholder={dict.msgPlaceholder}
                   value={inquiryForm.nachricht}
-                  onChange={e => setInquiryForm({...inquiryForm, nachricht: e.target.value})} />
+                  onChange={e => setInquiryForm(p => ({ ...p, nachricht: e.target.value }))} />
               </div>
+
               <button type="submit" className="btn-primary w-full" disabled={inquiryLoading}>
-                {inquiryLoading ? 'Sending...' : dict.submitBtn}
+                {inquiryLoading ? 'Sending…' : dict.submitBtn}
               </button>
             </form>
           </div>

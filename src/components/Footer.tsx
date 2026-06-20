@@ -1,6 +1,34 @@
+'use client'
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
+import { CONTENT_API_BASE } from '@/lib/admin-api'
+
+interface ContactData {
+  company_name: string
+  street: string
+  zip_code: string
+  city: string
+  country: string
+  phone: string
+  email: string
+}
 
 export default function Footer({ footerDict, navDict, lang }: { footerDict: any; navDict: any; lang: string }) {
+  const [contact, setContact] = useState<ContactData | null>(null)
+
+  useEffect(() => {
+    fetch(`${CONTENT_API_BASE}/contact`)
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data && !data.error) setContact(data) })
+      .catch(() => {})
+  }, [])
+
+  const companyName = contact?.company_name || 'Jobandu GmbH'
+  const street      = contact?.street       || 'Johannes-Kepler-Str. 7'
+  const zipCity     = contact ? `${contact.zip_code} ${contact.city}` : '54634 Bitburg'
+  const phone       = contact?.phone        || '+49 (0) 65619451-144'
+  const email       = contact?.email        || 'info@jobandu.de'
+
   return (
     <footer className="footer">
       <div className="footer-inner">
@@ -11,16 +39,16 @@ export default function Footer({ footerDict, navDict, lang }: { footerDict: any;
             <h5 className="footer-col-title">{footerDict.contact}</h5>
             <div className="footer-divider" />
             <div className="footer-contact-info">
-              <p>Jobandu GmbH</p>
-              <p>Johannes-Kepler-Str. 7</p>
-              <p>54634 Bitburg</p>
+              <p>{companyName}</p>
+              <p>{street}</p>
+              <p>{zipCity}</p>
               <p className="footer-contact-row">
                 <span>Tel:</span>
-                <a href="tel:+4965619451144" className="footer-link">+49 (0) 65619451-144</a>
+                <a href={`tel:${phone.replace(/[\s()/-]/g, '')}`} className="footer-link">{phone}</a>
               </p>
               <p className="footer-contact-row">
                 <span>Mail:</span>
-                <a href="mailto:info@jobandu.de" className="footer-link">info@jobandu.de</a>
+                <a href={`mailto:${email}`} className="footer-link">{email}</a>
               </p>
             </div>
           </div>
@@ -76,7 +104,7 @@ export default function Footer({ footerDict, navDict, lang }: { footerDict: any;
             </h5>
             <div className="footer-divider" />
             <img
-              src="https://jobandu.de/wp-content/uploads/2025/07/GVP-Logo_Mitglied_quer_blau_RGB-1-002.png"
+              src="/images/gvp-logo.png"
               alt="GVP Mitglied"
               className="footer-gvp-logo"
             />

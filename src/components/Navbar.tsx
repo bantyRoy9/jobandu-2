@@ -137,7 +137,7 @@ export default function Navbar({ dict, lang }: { dict: any; lang: string }) {
           <div className="navbar-left">
             <Link href={`/${lang}`} className="navbar-logo-link" aria-label="Jobandu – Home">
               <img
-                src="https://jobandu.de/wp-content/uploads/2025/05/1.png"
+                src="/images/logo.png"
                 alt="Jobandu"
                 className="navbar-logo"
               />

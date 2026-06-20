@@ -5,7 +5,7 @@ export default function ServiceTypes({ dict }: { dict: any }) {
       desc: dict.s1Desc,
       benefitsLabel: dict.s1BenefitsLabel || 'Your Benefits',
       bullets: [dict.s1B1, dict.s1B2, dict.s1B3],
-      img: 'https://jobandu.de/wp-content/uploads/2025/05/zeitarbeitt.png',
+      img: '/images/service-zeitarbeit.png',
       imgRight: true,
     },
     {
@@ -13,7 +13,7 @@ export default function ServiceTypes({ dict }: { dict: any }) {
       desc: dict.s2Desc,
       benefitsLabel: dict.s2BenefitsLabel || 'This means for you:',
       bullets: [dict.s2B1, dict.s2B2, dict.s2B3],
-      img: 'https://jobandu.de/wp-content/uploads/2025/05/tryandhire-scaled.jpg',
+      img: '/images/service-tryandhire.jpg',
       imgRight: false,
     },
     {
@@ -21,7 +21,7 @@ export default function ServiceTypes({ dict }: { dict: any }) {
       desc: dict.s3Desc,
       benefitsLabel: dict.s3BenefitsLabel || 'Our recruiting service includes:',
       bullets: [dict.s3B1, dict.s3B2, dict.s3B3],
-      img: 'https://jobandu.de/wp-content/uploads/2025/05/recruiting-scaled.jpg',
+      img: '/images/service-recruiting.jpg',
       imgRight: true,
     },
   ]
